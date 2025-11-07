@@ -10,13 +10,20 @@ from protocol import (
 )
 
 class Client:
-    def __init__(self, device_id, host, port, interval):
+    def __init__(self, device_id, host, port, interval, seed=None):
         self.device_id = device_id
         self.host = host
         self.port = port
         self.interval = interval
         self.seq = 0
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        if seed is not None:
+            random.seed(seed)
+            print(f"[CLIENT] Random seed set to {seed}")
+        else:
+            random.seed()
+            print("[CLIENT] No seed provided, using system randomness...")
 
     def send_init(self):
         packet = TelemetryPacket(
@@ -30,7 +37,7 @@ class Client:
     def send_data(self):
         readings = [
             SensorReading(SENSOR_TEMP,  random.uniform(20, 30)),
-            SensorReading(SENSOR_HUM, random.uniform(40, 60)),
+            SensorReading(SENSOR_HUM,   random.uniform(40, 60)),
             SensorReading(SENSOR_VOLT,  random.uniform(4.5, 5.5))
         ]
 
@@ -63,7 +70,8 @@ if __name__ == "__main__":
     parser.add_argument("--server-port", type=int, required=True)
     parser.add_argument("--interval", type=float, default=1.0)
     parser.add_argument("--duration", type=float, default=10.0)
+    parser.add_argument("--seed", type=int, help="Optional random seed for reproducibility")
     args = parser.parse_args()
 
-    client = Client(args.device_id, args.server_host, args.server_port, args.interval) #client instance
+    client = Client(args.device_id, args.server_host, args.server_port, args.interval, args.seed)
     client.run(args.duration)

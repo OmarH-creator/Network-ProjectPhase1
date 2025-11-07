@@ -16,18 +16,18 @@ BLUE = "\033[94m"
 RED = "\033[91m"
 CYAN = "\033[96m"
 
-# --- Detect Python executable (works on both Windows & Linux) ---
+# --- Detect Python executable (cross-platform) ---
 PYTHON_CMD = shutil.which("python") or shutil.which("python3")
 if not PYTHON_CMD:
     print(f"{RED}[ERROR]{RESET} Could not find Python executable.")
     sys.exit(1)
 
-SERVER_CMD = [PYTHON_CMD, "-u", "server.py"]
-
 
 def stream_output(proc, prefix, logfile, color):
-    """Reads subprocess stdout line-by-line and streams to console + logfile."""
+    # Reads subprocess stdout line-by-line and streams to console + logfile
     for line in iter(proc.stdout.readline, ''):
+        if not line:
+            break
         sys.stdout.write(f"{color}{prefix}{RESET} {line}")
         logfile.write(line)
         logfile.flush()
@@ -41,7 +41,14 @@ def run_baseline(args):
     server_log = open("server_log.txt", "w", buffering=1)
     client_log = open("client_log.txt", "w", buffering=1)
 
-    # Start server in background and capture its output
+
+    SERVER_CMD = [
+        PYTHON_CMD, "-u", "server.py",
+        "--port", str(args.server_port),
+        "--log-file", args.server_log_file
+    ]
+
+    # Start server process
     server_proc = subprocess.Popen(
         SERVER_CMD,
         stdout=subprocess.PIPE,
@@ -49,18 +56,18 @@ def run_baseline(args):
         text=True
     )
 
-    # Stream server output in background
+    # Stream server output concurrently
     threading.Thread(
         target=stream_output,
         args=(server_proc, "[SERVER]", server_log, YELLOW),
         daemon=True
     ).start()
 
-    # Wait for server startup
     time.sleep(2)
-    print(f"{GREEN}[OK]{RESET} Server is running. Launching client...\n")
+    print(f"{GREEN}[OK]{RESET} Server running → Launching client...\n")
 
-    client_cmd = [
+
+    CLIENT_CMD = [
         PYTHON_CMD, "-u", "client.py",
         "--device-id", str(args.device_id),
         "--server-host", args.server_host,
@@ -69,15 +76,22 @@ def run_baseline(args):
         "--duration", str(args.duration)
     ]
 
+
+    if args.seed is not None:
+        CLIENT_CMD += ["--seed", str(args.seed)]
+
     try:
-        # Start client and stream its output live
+        # Start client and stream its output
         client_proc = subprocess.Popen(
-            client_cmd,
+            CLIENT_CMD,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True
         )
+
         for line in iter(client_proc.stdout.readline, ''):
+            if not line:
+                break
             sys.stdout.write(f"{CYAN}[CLIENT]{RESET} {line}")
             client_log.write(line)
             client_log.flush()
@@ -108,11 +122,20 @@ def run_baseline(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="TinyTelemetry Client")
-    parser.add_argument("--device-id", type=int, required=True)
-    parser.add_argument("--server-host", required=True)
-    parser.add_argument("--server-port", type=int, required=True)
-    parser.add_argument("--interval", type=float, default=1.0)
-    parser.add_argument("--duration", type=float, default=10.0)
+    parser = argparse.ArgumentParser(
+        description="Automated TinyTelemetry Test Runner",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    parser.add_argument("--device-id", type=int, required=True, help="Unique ID for the device")
+    parser.add_argument("--server-host", required=True, help="Server hostname or IP address")
+    parser.add_argument("--server-port", type=int, default=5000, help="Port used for communication")
+    parser.add_argument("--interval", type=float, default=1.0, help="Time interval between readings (seconds)")
+    parser.add_argument("--duration", type=float, default=10.0, help="Total runtime for the client (seconds)")
+    parser.add_argument("--seed", type=int, help="Optional random seed for reproducibility")
+
+    parser.add_argument("--server-log-file", type=str, default="telemetry.csv",
+                        help="Server CSV log file name")
+
     args = parser.parse_args()
     run_baseline(args)

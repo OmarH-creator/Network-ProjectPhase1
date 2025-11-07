@@ -108,11 +108,11 @@ def run_baseline(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run baseline telemetry test")
-    parser.add_argument("--device-id", type=int, default=1)
-    parser.add_argument("--server-host", default="127.0.0.1")
-    parser.add_argument("--server-port", type=int, default=5000)
-    parser.add_argument("--interval", type=int, default=1)
-    parser.add_argument("--duration", type=int, default=10)
+    parser = argparse.ArgumentParser(description="TinyTelemetry Client")
+    parser.add_argument("--device-id", type=int, required=True)
+    parser.add_argument("--server-host", required=True)
+    parser.add_argument("--server-port", type=int, required=True)
+    parser.add_argument("--interval", type=float, default=1.0)
+    parser.add_argument("--duration", type=float, default=10.0)
     args = parser.parse_args()
     run_baseline(args)

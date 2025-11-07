@@ -32,7 +32,7 @@ TinyTelemetry/
 ├── protocol.py # Defines the packet format, header fields, and encoding/decoding
 ├── server.py # Collects incoming telemetry packets and logs them to CSV
 ├── client.py # Simulates IoT devices sending periodic readings
-├── run_experiment.py # Automates the client-server experiment (cross-platform)
+├── auto_script_run.py # Automates the client-server experiment (cross-platform)
 │
 ├── telemetry.csv # (Generated) Server data log
 ├── server_log.txt # (Generated) Server console output

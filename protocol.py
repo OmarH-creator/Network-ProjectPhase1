@@ -51,7 +51,7 @@ def encode_packet(packet: TelemetryPacket):
     packet = header (12 bytes) + reading count (1 byte) * readings (5 bytes)
     NIT       -> header only
     HEARTBEAT -> header only
-    DATA       -> header + reading_count + reading blocks"""
+    DATA       -> header + reading_count + reading blocks """
 
     # always encode header
     data = encode_header(packet.version, packet.msg_type, packet.device_id, packet.seq_num, packet.timestamp)
@@ -82,15 +82,15 @@ def encode_packet(packet: TelemetryPacket):
     return data
 
 
-# decoding functions
+# --------------decoding functions---------------
 
 def decode_header(data):
     if len(data) < HEADER_SIZE:
-        raise ValueError("Data too short for header")
+        raise ValueError("Data too short for header ")
 
     return struct.unpack('!BBHII', data[:HEADER_SIZE])
 
-
+ 
 def decode_reading(data):
     return struct.unpack('!Bf', data[:READING_SIZE])
 
@@ -98,80 +98,86 @@ def decode_reading(data):
 def decode_packet(data):
     # 1 Decode the 12-byte header
     version, msg_type, device_id, seq_num, timestamp = decode_header(data)
+    payload = data[HEADER_SIZE:]
     # written like this bc decode header returns a tuple of 5 values
 
     # Step 2: Prepare to store readings
     readings = []
 
-    # Step 3: If more than 12 bytes, it must have sensor data
-    if len(data) > HEADER_SIZE:
-        # Byte 13 = number of readings
-        count = struct.unpack('!B', data[HEADER_SIZE:HEADER_SIZE + 1])[0]
+    #same as encoder makes sure no payload for INIT and HEARTBEAT
+    if msg_type in (MSG_INIT, MSG_HEARTBEAT):
+        if len(payload) != HEADER_SIZE:
+            raise ValueError("INIT/HEARTBEAT packets cannot contain readings")
+        return TelemetryPacket(version, msg_type, device_id, seq_num, timestamp, readings)
 
-        # Step 4: Decode each reading
-        offset = HEADER_SIZE + 1
-        for _ in range(count):
-            sensor_type, value = decode_reading(data[offset:offset + READING_SIZE])
+    if msg_type == MSG_DATA:
+
+        if len(payload) < 1:
+            raise ValueError("DATA packet missing reading_count")
+
+        # Read the reading count
+        reading_count = struct.unpack('!B', payload[0:1])[0]
+        if reading_count == 0:
+            raise ValueError("DATA packet must contain at least 1 reading")
+
+        expected_size = 1 + reading_count * READING_SIZE
+        if len(payload) != expected_size:
+            raise ValueError("Malformed DATA payload size mismatch")
+
+        # Decode reading blocks
+        offset = 1  # start after reading_count byte
+        for _ in range(reading_count):
+            sensor_type, value = decode_reading(payload[offset:offset + READING_SIZE])
             readings.append(SensorReading(sensor_type, value))
             offset += READING_SIZE
 
     # Step 5: Return the TelemetryPacket
     return TelemetryPacket(version, msg_type, device_id, seq_num, timestamp, readings)
-
+    
 
 # main function testing
 if __name__ == "__main__":
 
-    # test init packet
+    # TEST INIT
     init_packet = TelemetryPacket(
         version=VERSION,
-        msg_type=MSG_INIT,  # INIT message
-        device_id=1001,
+        msg_type=MSG_INIT,
+        device_id=1,
         seq_num=0,
         timestamp=1234567890,
-        readings=[]  # No readings for INIT
+        readings=[]
     )
 
     data = encode_packet(init_packet)
-    print(f"Encoded INIT packet size: {len(data)} bytes")
-    print(f"Hex: {data.hex()}")
+    print(f"INIT ({len(data)} bytes) -> {data.hex()}")
 
-    # test data packet
+    # TEST HEARTBEAT
+    heartbeat_packet = TelemetryPacket(
+        version=VERSION,
+        msg_type=MSG_HEARTBEAT,
+        device_id=1,
+        seq_num=5,
+        timestamp=1234567895,
+        readings=[]
+    )
+
+    hb_data = encode_packet(heartbeat_packet)
+    print(f"HEARTBEAT ({len(hb_data)} bytes) -> {hb_data.hex()}")
+
+    # TEST DATA
     data_packet = TelemetryPacket(
         version=VERSION,
-        msg_type=MSG_DATA,  # DATA message
-        device_id=1001,
+        msg_type=MSG_DATA,
+        device_id=1,
         seq_num=1,
         timestamp=1234567890,
-        readings=[SensorReading(SENSOR_TEMP, 25.0),
-                  SensorReading(SENSOR_HUM, 60.5),
-                  SensorReading(SENSOR_VOLT, 3.3)]  # Example readings
+        readings=[SensorReading(SENSOR_TEMP, 25.0)]
     )
 
     data2 = encode_packet(data_packet)
-    print(f"Encoded DATA packet size: {len(data2)} bytes")
-    print(f"Hex: {data2.hex()}")
+    print(f"DATA ({len(data2)} bytes) -> {data2.hex()}")
 
-    # TEST DECODING STARTS HERE
-
-    # Decode the INIT packet
-    decoded_init = decode_packet(data)
-    print("\nDecoded INIT packet:")
-    print(f"Version: {decoded_init.version}")
-    print(f"Msg Type: {decoded_init.msg_type}")
-    print(f"Device ID: {decoded_init.device_id}")
-    print(f"Seq Num: {decoded_init.seq_num}")
-    print(f"Timestamp: {decoded_init.timestamp}")
-    print(f"Readings: {len(decoded_init.readings)} (expected 0)")
-
-    # Decode the DATA packet
-    decoded_data = decode_packet(data2)
-    print("\nDecoded DATA packet:")
-    print(f"Version: {decoded_data.version}")
-    print(f"Msg Type: {decoded_data.msg_type}")
-    print(f"Device ID: {decoded_data.device_id}")
-    print(f"Seq Num: {decoded_data.seq_num}")
-    print(f"Timestamp: {decoded_data.timestamp}")
-    print(f"Number of readings: {len(decoded_data.readings)}")
-    for r in decoded_data.readings:
-        print(f"  Sensor type: {r.sensor_type}, Value: {r.value:.2f}")
+    # DECODE TESTS
+    print("\nDecoded HEARTBEAT:")
+    decoded_hb = decode_packet(hb_data)
+    print(vars(decoded_hb))

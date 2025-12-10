@@ -36,7 +36,8 @@ class TelemetryPacket:
         self.readings = readings
 
 
-# encoding functions
+# --------------- encoding functions -------------
+
 def encode_header(version, msg_type, device_id, seq_num, timestamp):
     return struct.pack('!BBHII', version, msg_type, device_id, seq_num, timestamp)
 
@@ -47,14 +48,26 @@ def encode_reading(sensor_type, value):
 
 def encode_packet(packet: TelemetryPacket):
     """ turn complete packet into bytes and save it in data
-    packet = header (12 bytes) + reading count (1 byte) * readings (5 bytes)"""
+    packet = header (12 bytes) + reading count (1 byte) * readings (5 bytes)
+    NIT       -> header only
+    HEARTBEAT -> header only
+    DATA       -> header + reading_count + reading blocks"""
 
     # always encode header
     data = encode_header(packet.version, packet.msg_type, packet.device_id, packet.seq_num, packet.timestamp)
 
+    # makes sure no readings for INIT and HEARTBEAT
+    if packet.msg_type in (MSG_INIT, MSG_HEARTBEAT):
+        if len(packet.readings) != 0:
+            raise ValueError("INIT/HEARTBEAT packets cannot contain readings")
+        return data
+
     # encode readings
     if packet.msg_type == MSG_DATA:
         reading_count = len(packet.readings)
+
+        if reading_count == 0:
+            raise ValueError("DATA packets must contain at least 1 reading")
 
         # error checks
         size = HEADER_SIZE + 1 + reading_count * READING_SIZE

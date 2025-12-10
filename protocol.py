@@ -6,6 +6,7 @@ VERSION = 0x01
 # message type
 MSG_INIT = 0x00
 MSG_DATA = 0x01
+MSG_HEARTBEAT = 0x02
 
 # sensor type
 SENSOR_TEMP = 0x01

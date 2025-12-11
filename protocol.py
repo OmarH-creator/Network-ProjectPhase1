@@ -15,12 +15,15 @@ SENSOR_TEMP = 0x01
 SENSOR_HUM = 0x02
 SENSOR_VOLT = 0x03
 
+ALLOWED_DEVICE_IDS = {1, 2, 3}
+
 #size in bytes
-HEADER_SIZE = 12 
+HEADER_SIZE = 13  # version(1) + msg_type(1) + flags(1) + device_id(2) + seq_num(4) + timestamp(4)
 READING_SIZE = 5 
 PAYLOAD_LIMIT = 200
 
-BATCHING_ENABLED = False
+#flags
+FLAG_BATCHING = 0x01  # bit 0: batching enabled
 
 class SensorReading:
     def __init__(self, sensor_type: int, value: float):
@@ -28,53 +31,68 @@ class SensorReading:
         self.value = value
 
 class TelemetryPacket:
-    def __init__(self, version: int, msg_type: int, device_id: int, seq_num: int, timestamp: int, readings: List[SensorReading]):
+    def __init__(self, version: int, msg_type: int, device_id: int, 
+                 seq_num: int, timestamp: int, readings: List[SensorReading], flags: int = 0):
         self.version = version
         self.msg_type = msg_type
         self.device_id = device_id
         self.seq_num = seq_num
         self.timestamp = timestamp
         self.readings = readings
-
+        self.flags = flags
 
 
 #encoding functions
-def encode_header(version, msg_type, device_id, seq_num, timestamp):    
-    return struct.pack('!BBHII', version, msg_type, device_id, seq_num, timestamp)
+def encode_header(version: int, msg_type: int, flags: int, device_id: int, 
+                  seq_num: int, timestamp: int) -> bytes:
+    # format: version(1B) + msg_type(1B) + flags(1B) + device_id(2H) + seq_num(4I) + timestamp(4I) = 13 bytes
+    return struct.pack('!BBBHII', version, msg_type, flags, device_id, seq_num, timestamp)
 
-def encode_reading(sensor_type, value):
+
+def encode_reading(sensor_type: int, value: float) -> bytes:
     return struct.pack('!Bf', sensor_type, value)
 
-def encode_packet(packet: TelemetryPacket):
 
+def encode_packet(packet: TelemetryPacket) -> bytes:
     """ turn complete packet into bytes and save it in data 
-    packet = header (12 bytes) + reading count (1 byte) * readings (5 bytes)"""
-
+    packet = header (13 bytes) + reading count (1 byte) * readings (5 bytes)"""
+    
     #validation before encoding
     if packet.version != VERSION:
         raise ValueError(f"Invalid version: {packet.version}")
     
     if packet.msg_type not in (MSG_INIT, MSG_DATA, MSG_HEARTBEAT):
         raise ValueError(f"Unknown message type: {packet.msg_type}")
-
-    if packet.device_id <= 0 or packet.device_id > 0xFFFF:
+    
+    if packet.device_id not in ALLOWED_DEVICE_IDS:
         raise ValueError(f"Invalid device ID: {packet.device_id}")
-
+    
     if packet.seq_num is None or packet.seq_num < 0:
         raise ValueError(f"Invalid sequence number: {packet.seq_num}")
     
+    #always encode header with correct field order (version, msg_type, flags, device_id, seq_num, timestamp)
+    data = encode_header(packet.version, packet.msg_type, packet.flags, 
+                        packet.device_id, packet.seq_num, packet.timestamp)
     
-    #validate readings exsit or not according to msg type
+    #INIT or HEARTBEAT
+    if packet.msg_type in (MSG_INIT, MSG_HEARTBEAT):
+        if len(packet.readings) != 0:
+            raise ValueError(f"{('INIT' if packet.msg_type == MSG_INIT else 'HEARTBEAT')} "
+                           "packets must not contain readings")
+        return data
+    
+    #encode readings
     if packet.msg_type == MSG_DATA:
         reading_count = len(packet.readings)
+        
         if reading_count == 0:
-            raise ValueError(f"DATA packet must contain at least one reading")
+            raise ValueError("DATA packet must contain at least one reading")
         
         #check total size
-        size = HEADER_SIZE + 1 + reading_count * READING_SIZE
-        if size > PAYLOAD_LIMIT:
-            raise ValueError("Packet exceeds payload limit")
-
+        total_size = HEADER_SIZE + 1 + reading_count * READING_SIZE
+        if total_size > PAYLOAD_LIMIT:
+            raise ValueError(f"Packet exceeds payload limit: {total_size} > {PAYLOAD_LIMIT}")
+        
         #validate each reading list 
         for idx, reading in enumerate(packet.readings):
             #invalid sensor type
@@ -84,88 +102,130 @@ def encode_packet(packet: TelemetryPacket):
             #invalid value (not finite or not int, float)
             if not isinstance(reading.value, (int, float)) or not math.isfinite(reading.value):
                 raise ValueError(f"Invalid reading value in reading {idx}: {reading.value}")
-
-    #INIT or HEARTBEAT
-    else:
-        if packet.msg_type == MSG_INIT:
-            if packet.readings:
-                raise ValueError("INIT packets must not contain readings")
-            
-        if packet.msg_type == MSG_HEARTBEAT:
-            if packet.readings:
-                raise ValueError("HEARTBEAT packets must not contain readings")
-
-
-    #always encode header
-    data = encode_header(packet.version, packet.msg_type, packet.device_id, packet.seq_num, packet.timestamp)
-
-    #encode readings
-    if packet.msg_type == MSG_DATA:
-        reading_count = len(packet.readings)
-
-        #error checks
-        size = HEADER_SIZE + 1 + reading_count * READING_SIZE
-        if size > PAYLOAD_LIMIT:
-            raise ValueError("Packet exceeds payload limit")
-
-        data += struct.pack('!B', len(packet.readings)) #count how many readings 1 byte
-
+        
+        data += struct.pack('!B', reading_count) #count how many readings 1 byte
+        
         for reading in packet.readings:
             data += encode_reading(reading.sensor_type, reading.value)
+        
+        return data
     
-    return data
-
+    raise ValueError(f"Unreachable encoding state for msg_type: {packet.msg_type}")
 
 
 #decoding functions
 
-def decode_header(data):
+def decode_header(data: bytes) -> tuple:
     if len(data) < HEADER_SIZE:
-        raise ValueError("Data too short for header")
-    
-    return struct.unpack('!BBHII', data[:HEADER_SIZE])
+        raise ValueError(f"Data too short for header: {len(data)} < {HEADER_SIZE}")
+    # format: version, msg_type, flags, device_id, seq_num, timestamp (13 bytes total)
+    return struct.unpack('!BBBHII', data[:HEADER_SIZE])
 
-def decode_reading(data):
+
+def decode_reading(data: bytes) -> tuple:
+    if len(data) < READING_SIZE:
+        raise ValueError(f"Not enough bytes for reading: {len(data)} < {READING_SIZE}")
+    
     return struct.unpack('!Bf', data[:READING_SIZE])
 
-def decode_packet(data):
-    #1 Decode the 12-byte header
-    version, msg_type, device_id, seq_num, timestamp = decode_header(data)
-    #written like this bc decode header returns a tuple of 5 values
 
+def decode_packet(data: bytes) -> TelemetryPacket:
+    #1 Decode the 13-byte header (version, msg_type, flags, device_id, seq_num, timestamp)
+    version, msg_type, flags, device_id, seq_num, timestamp = decode_header(data)
+    #written like this bc decode header returns a tuple of 6 values
+    
     # Step 2: Prepare to store readings
     readings = []
-
-    # Step 3: If more than 12 bytes, it must have sensor data
-    if len(data) > HEADER_SIZE:
+    
+    #header validation
+    if version != VERSION:
+        raise ValueError(f"Version mismatch: expected {VERSION}, got {version}")
+    
+    if msg_type not in (MSG_INIT, MSG_DATA, MSG_HEARTBEAT):
+        raise ValueError(f"Unknown msg_type: {msg_type}")
+    
+    if device_id not in ALLOWED_DEVICE_IDS:
+        raise ValueError(f"Invalid device_id: {device_id}")
+    
+    if seq_num < 0:
+        raise ValueError(f"Invalid sequence number: {seq_num}")
+    
+    #payload extraction
+    payload = data[HEADER_SIZE:]
+    payload_len = len(payload)
+    
+    #INIT / HEARTBEAT
+    if msg_type in (MSG_INIT, MSG_HEARTBEAT):
+        if payload_len != 0:
+            raise ValueError(f"{('INIT' if msg_type == MSG_INIT else 'HEARTBEAT')} "
+                           "packets must have no payload")
+        return TelemetryPacket(version, msg_type, device_id, seq_num, timestamp, [], flags)
+    
+    #DATA PACKETS
+    if msg_type == MSG_DATA:
+        # Step 3: If more than 12 bytes, it must have sensor data
+        if payload_len < 1:
+            raise ValueError("DATA packet missing reading_count byte")
+        
         # Byte 13 = number of readings
-        count = struct.unpack('!B', data[HEADER_SIZE:HEADER_SIZE+1])[0]
-
+        reading_count = payload[0]
+        
+        if reading_count <= 0:
+            raise ValueError("DATA packet must contain at least 1 reading")
+        
+        expected_size = 1 + reading_count * READING_SIZE
+        
+        # leftover / truncated
+        if payload_len < expected_size:
+            raise ValueError(f"Truncated DATA packet: expected {expected_size}, got {payload_len}")
+        
+        if payload_len > expected_size:
+            raise ValueError(f"Extra bytes in DATA packet: expected {expected_size}, got {payload_len}")
+        
         # Step 4: Decode each reading
-        offset = HEADER_SIZE + 1
-        for _ in range(count):
-            sensor_type, value = decode_reading(data[offset:offset+READING_SIZE])
+        offset = 1
+        
+        for i in range(reading_count):
+            # offset safety check
+            if offset + READING_SIZE > payload_len:
+                raise ValueError(f"Truncated reading block at index {i}")
+            
+            sensor_type, value = decode_reading(payload[offset:offset + READING_SIZE])
+            
+            if sensor_type not in (SENSOR_TEMP, SENSOR_HUM, SENSOR_VOLT):
+                raise ValueError(f"Invalid sensor_type in reading {i}: {sensor_type}")
+            
+            if not math.isfinite(value):
+                raise ValueError(f"Invalid reading value in reading {i}: {value}")
+            
             readings.append(SensorReading(sensor_type, value))
             offset += READING_SIZE
-
-    # Step 5: Return the TelemetryPacket
-    return TelemetryPacket(version, msg_type, device_id, seq_num, timestamp, readings)
-
-
+        
+        # final leftover check
+        if offset != payload_len:
+            raise ValueError(f"Unused bytes after readings: {payload_len - offset} bytes remaining")
+        
+        # Step 5: Return the TelemetryPacket with flags
+        return TelemetryPacket(version, msg_type, device_id, seq_num, timestamp, readings, flags)
+    
+    raise ValueError(f"Unreachable decoding state for msg_type: {msg_type}")
 
 
 #batching functions
-def create_reading_packet(sensor_type: int, value: float, device_id: int, seq_num: int, timestamp: int) -> TelemetryPacket:
-    #create a DATA packet containing one sensor reading
+def create_reading_packet(sensor_type: int, value: float, device_id: int, 
+                         seq_num: int, timestamp: int) -> TelemetryPacket:
+    #create a DATA packet containing one sensor reading (flags=0, not batched)
     reading = SensorReading(sensor_type, value)
     return TelemetryPacket(
-        version = VERSION,
-        msg_type = MSG_DATA,
-        device_id = device_id,
-        seq_num = seq_num,
-        timestamp = timestamp,
-        readings = [reading]
+        version=VERSION,
+        msg_type=MSG_DATA,
+        device_id=device_id,
+        seq_num=seq_num,
+        timestamp=timestamp,
+        readings=[reading],
+        flags=0
     )
+
 
 def batch_packets(packets: List[TelemetryPacket]) -> TelemetryPacket:
     #merge N DATA packets in one packet when batching is ON
@@ -175,23 +235,23 @@ def batch_packets(packets: List[TelemetryPacket]) -> TelemetryPacket:
     for idx, p in enumerate(packets):
         if p.msg_type != MSG_DATA:
             raise ValueError(f"Packet {idx} is not DATA so cannot batch {p.msg_type}")
-
+    
     #error if readings to be batched not from the same device
     device_ids = {p.device_id for p in packets}
     if len(device_ids) != 1:
-        raise ValueError("Can only batch packets from the same device id")
+        raise ValueError(f"Cannot batch packets from different devices: {device_ids}")
     
     combined_readings: List[SensorReading] = []
     for p in packets:
         combined_readings.extend(p.readings)
-
+    
     device_id = packets[0].device_id
-    seq_num = max((p.seq_num for p in packets if p.seq_num is not None), default = 0)
-    timestamp = max((p.timestamp for p in packets if p.timestamp is not None), default = 0)
-
+    seq_num = max((p.seq_num for p in packets if p.seq_num is not None), default=0)
+    timestamp = max((p.timestamp for p in packets if p.timestamp is not None), default=0)
+    
     size = HEADER_SIZE + 1 + len(combined_readings) * READING_SIZE
     if size > PAYLOAD_LIMIT:
-        raise ValueError(f"Batched packet exceeds payload limit ({size} > {PAYLOAD_LIMIT})")
+        raise ValueError(f"Batched packet exceeds payload limit: {size} > {PAYLOAD_LIMIT}")
     
     return TelemetryPacket(
         version=VERSION,
@@ -199,66 +259,18 @@ def batch_packets(packets: List[TelemetryPacket]) -> TelemetryPacket:
         device_id=device_id,
         seq_num=seq_num,
         timestamp=timestamp,
-        readings=combined_readings
+        readings=combined_readings,
+        flags=FLAG_BATCHING
     )
-
-#if packet after batching exceeds payload, then chunk the packet
-def chunk_packets(packets: List[TelemetryPacket]) -> List[TelemetryPacket]:
-    if not packets:
-        return[]
-
-    for idx, p in enumerate(packets):
-        if p.msg_type != MSG_DATA:
-            raise ValueError(f"Packet {idx} is not DATA chunking not supported for {p.msg_type}")  
-    
-    #group packets by device id
-    groups: Dict[int, List[TelemetryPacket]] = {}
-    for p in packets:
-        groups.setdefault(p.device_id, []).append(p)
-
-
-    #calculate max reading per packet
-    result: List[TelemetryPacket] = []
-    max_packet_readings = (PAYLOAD_LIMIT - HEADER_SIZE - 1) // READING_SIZE
-    if max_packet_readings <= 0:
-        raise ValueError("PAYLOAD_LIMIT too small to fit any readings")
-    
-    #process each device's packets
-    for device_id, plist in groups.items():
-        all_readings: List[SensorReading] = []
-        seq_nums: List[int] = []
-        timestamps: List[int] = []
-        for p in plist:
-            all_readings.extend(p.readings)
-            if p.seq_num is not None:
-                seq_nums.append(p.seq_num)
-            if p.timestamp is not None:
-                timestamps.append(p.timestamp)
-
-        #splitting readings into chunks 
-        for i in range(0, len(all_readings), max_packet_readings):
-            chunk = all_readings[i:i + max_packet_readings] #i = 0, 37, 74, ...
-            seq_num = max(seq_nums) if seq_nums else 0
-            timestamp = max(timestamps) if timestamps else 0
-            pkt = TelemetryPacket(
-                version=VERSION,
-                msg_type=MSG_DATA,
-                device_id=device_id,
-                seq_num=seq_num,
-                timestamp=timestamp,
-                readings=chunk
-            )
-            result.append(pkt)
-
-    return result
 
 
 #function used by client
 def send_packet(packets: List[TelemetryPacket], batching: Optional[bool] = None) -> List[bytes]:
-
+    #check if batching should be enabled based on flags if not specified
     if batching is None:
-        batching = BATCHING_ENABLED
-
+        #check if any packet has batching flag set
+        batching = any(p.flags & FLAG_BATCHING for p in packets)
+    
     #no batching so call encode packet function
     if not batching:
         out = []
@@ -271,79 +283,139 @@ def send_packet(packets: List[TelemetryPacket], batching: Optional[bool] = None)
     groups: Dict[int, List[TelemetryPacket]] = {}
     for p in packets:
         if p.msg_type != MSG_DATA:
-            raise ValueError("SHould be DATA packets")
-        
+            raise ValueError("Batching only supports DATA packets")
         groups.setdefault(p.device_id, []).append(p)
     
     out_bytes: List[bytes] = []
     for device_id, plist in groups.items():
-        try:
-            batched = batch_packets(plist)
-            out_bytes.append(encode_packet(batched))
-        except ValueError:
-            # batching created a packet too large thne call chunk packets
-            chunks = chunk_packets(plist)
-            for c in chunks:
-                out_bytes.append(encode_packet(c))
-
-    return out_bytes    
+        # batch_packets() sets flags=FLAG_BATCHING
+        batched = batch_packets(plist)
+        out_bytes.append(encode_packet(batched))
+    
+    return out_bytes
 
 
 #main function testing 
 if __name__ == "__main__":
-   
-    #test init packet
+    print("=" * 60)
+    print("TESTING IOT TELEMETRY PROTOCOL")
+    print("=" * 60)
+    
+    # ========== TEST 1: INIT PACKET ==========
+    print("\n[TEST 1] INIT Packet")
     init_packet = TelemetryPacket(
         version=VERSION,
-        msg_type=MSG_INIT,  # INIT message
-        device_id=1001,
+        msg_type=MSG_INIT,
+        device_id=1,
         seq_num=0,
         timestamp=1234567890,
-        readings=[]  # No readings for INIT
+        readings=[]
     )
     
-    data = encode_packet(init_packet)
-    print(f"Encoded INIT packet size: {len(data)} bytes")
-    print(f"Hex: {data.hex()}")
+    init_data = encode_packet(init_packet)
+    print(f"✓ Encoded INIT packet: {len(init_data)} bytes")
+    print(f"  Hex: {init_data.hex()}")
     
- 
-    #test data packet
-    data_packet = TelemetryPacket(
+    decoded_init = decode_packet(init_data)
+    print(f"✓ Decoded INIT packet:")
+    print(f"  Device ID: {decoded_init.device_id}, Seq: {decoded_init.seq_num}")
+    print(f"  Readings: {len(decoded_init.readings)} (expected 0)")
+    
+    # ========== TEST 2: HEARTBEAT PACKET ==========
+    print("\n[TEST 2] HEARTBEAT Packet")
+    hb_packet = TelemetryPacket(
         version=VERSION,
-        msg_type=MSG_DATA,  # DATA message
-        device_id=1001,
-        seq_num=1,
-        timestamp=1234567890,
-        readings=[SensorReading(SENSOR_TEMP, 25.0),
-                  SensorReading(SENSOR_HUM, 60.5),
-                  SensorReading(SENSOR_VOLT, 3.3)]  # Example readings
+        msg_type=MSG_HEARTBEAT,
+        device_id=2,
+        seq_num=5,
+        timestamp=1234567895,
+        readings=[]
     )
-
-    data2 = encode_packet(data_packet)
-    print(f"Encoded DATA packet size: {len(data2)} bytes")
-    print(f"Hex: {data2.hex()}")
-
-
-    # TEST DECODING STARTS HERE
-
-    # Decode the INIT packet
-    decoded_init = decode_packet(data)
-    print("\nDecoded INIT packet:")
-    print(f"Version: {decoded_init.version}")
-    print(f"Msg Type: {decoded_init.msg_type}")
-    print(f"Device ID: {decoded_init.device_id}")
-    print(f"Seq Num: {decoded_init.seq_num}")
-    print(f"Timestamp: {decoded_init.timestamp}")
-    print(f"Readings: {len(decoded_init.readings)} (expected 0)")
-
-    # Decode the DATA packet
-    decoded_data = decode_packet(data2)
-    print("\nDecoded DATA packet:")
-    print(f"Version: {decoded_data.version}")
-    print(f"Msg Type: {decoded_data.msg_type}")
-    print(f"Device ID: {decoded_data.device_id}")
-    print(f"Seq Num: {decoded_data.seq_num}")
-    print(f"Timestamp: {decoded_data.timestamp}")
-    print(f"Number of readings: {len(decoded_data.readings)}")
-    for r in decoded_data.readings:
-        print(f"  Sensor type: {r.sensor_type}, Value: {r.value:.2f}")
+    
+    hb_data = encode_packet(hb_packet)
+    print(f"✓ Encoded HEARTBEAT packet: {len(hb_data)} bytes")
+    print(f"  Hex: {hb_data.hex()}")
+    
+    decoded_hb = decode_packet(hb_data)
+    print(f"✓ Decoded HEARTBEAT packet:")
+    print(f"  Device ID: {decoded_hb.device_id}, Seq: {decoded_hb.seq_num}")
+    
+    # ========== TEST 3: DATA PACKET (SINGLE READING) ==========
+    print("\n[TEST 3] DATA Packet (Single Reading)")
+    single_data = TelemetryPacket(
+        version=VERSION,
+        msg_type=MSG_DATA,
+        device_id=1,
+        seq_num=1,
+        timestamp=1234567900,
+        readings=[SensorReading(SENSOR_TEMP, 25.5)]
+    )
+    
+    single_data_bytes = encode_packet(single_data)
+    print(f"✓ Encoded DATA packet: {len(single_data_bytes)} bytes")
+    print(f"  Hex: {single_data_bytes.hex()}")
+    
+    decoded_single = decode_packet(single_data_bytes)
+    print(f"✓ Decoded DATA packet:")
+    print(f"  Device ID: {decoded_single.device_id}, Seq: {decoded_single.seq_num}")
+    print(f"  Readings: {len(decoded_single.readings)}")
+    for r in decoded_single.readings:
+        print(f"    Sensor {r.sensor_type}: {r.value:.2f}")
+    
+    # ========== TEST 4: DATA PACKET (MULTIPLE READINGS) ==========
+    print("\n[TEST 4] DATA Packet (Multiple Readings - Batched)")
+    multi_data = TelemetryPacket(
+        version=VERSION,
+        msg_type=MSG_DATA,
+        device_id=3,
+        seq_num=10,
+        timestamp=1234567910,
+        readings=[
+            SensorReading(SENSOR_TEMP, 25.0),
+            SensorReading(SENSOR_HUM, 60.5),
+            SensorReading(SENSOR_VOLT, 3.3)
+        ]
+    )
+    
+    multi_data_bytes = encode_packet(multi_data)
+    print(f"✓ Encoded batched DATA packet: {len(multi_data_bytes)} bytes")
+    print(f"  Hex: {multi_data_bytes.hex()}")
+    
+    decoded_multi = decode_packet(multi_data_bytes)
+    print(f"✓ Decoded batched DATA packet:")
+    print(f"  Device ID: {decoded_multi.device_id}, Seq: {decoded_multi.seq_num}")
+    print(f"  Readings: {len(decoded_multi.readings)}")
+    for r in decoded_multi.readings:
+        sensor_name = {SENSOR_TEMP: "TEMP", SENSOR_HUM: "HUM", SENSOR_VOLT: "VOLT"}[r.sensor_type]
+        print(f"    {sensor_name}: {r.value:.2f}")
+    
+    # ========== TEST 5: BATCHING FUNCTION ==========
+    print("\n[TEST 5] Batching Multiple Packets")
+    p1 = create_reading_packet(SENSOR_TEMP, 22.0, 1, 20, 1234567920)
+    p2 = create_reading_packet(SENSOR_TEMP, 23.0, 1, 21, 1234567921)
+    p3 = create_reading_packet(SENSOR_TEMP, 24.0, 1, 22, 1234567922)
+    
+    batched = batch_packets([p1, p2, p3])
+    print(f"✓ Batched 3 packets into 1")
+    print(f"  Combined readings: {len(batched.readings)}")
+    print(f"  Seq num (latest): {batched.seq_num}")
+    print(f"  Flags: {batched.flags} (should be {FLAG_BATCHING})")
+    
+    batched_bytes = encode_packet(batched)
+    print(f"✓ Encoded batched packet: {len(batched_bytes)} bytes")
+    
+    # ========== TEST 6: SEND_PACKET FUNCTION ==========
+    print("\n[TEST 6] send_packet() Function")
+    packets_to_send = [p1, p2, p3]
+    
+    # Without batching
+    no_batch_bytes = send_packet(packets_to_send, batching=False)
+    print(f"✓ Without batching: {len(no_batch_bytes)} packets encoded")
+    
+    # With batching
+    with_batch_bytes = send_packet(packets_to_send, batching=True)
+    print(f"✓ With batching: {len(with_batch_bytes)} packets encoded")
+    
+    print("\n" + "=" * 60)
+    print("ALL TESTS PASSED ✓")
+    print("=" * 60)

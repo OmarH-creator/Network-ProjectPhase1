@@ -20,6 +20,8 @@ HEADER_SIZE = 12
 READING_SIZE = 5 
 PAYLOAD_LIMIT = 200
 
+BATCHING_ENABLED = False
+
 class SensorReading:
     def __init__(self, sensor_type: int, value: float):
         self.sensor_type = sensor_type
@@ -165,7 +167,7 @@ def create_reading_packet(sensor_type: int, value: float, device_id: int, seq_nu
         readings = [reading]
     )
 
-def batch_packet(packets: List[TelemetryPacket]) -> TelemetryPacket:
+def batch_packets(packets: List[TelemetryPacket]) -> TelemetryPacket:
     #merge N DATA packets in one packet when batching is ON
     if not packets:
         raise ValueError("No packets are present for batching")
@@ -200,6 +202,7 @@ def batch_packet(packets: List[TelemetryPacket]) -> TelemetryPacket:
         readings=combined_readings
     )
 
+#if packet after batching exceeds payload, then chunk the packet
 def chunk_packets(packets: List[TelemetryPacket]) -> List[TelemetryPacket]:
     if not packets:
         return[]
@@ -232,8 +235,9 @@ def chunk_packets(packets: List[TelemetryPacket]) -> List[TelemetryPacket]:
             if p.timestamp is not None:
                 timestamps.append(p.timestamp)
 
+        #splitting readings into chunks 
         for i in range(0, len(all_readings), max_packet_readings):
-            chunk = all_readings[i:i + max_packet_readings]
+            chunk = all_readings[i:i + max_packet_readings] #i = 0, 37, 74, ...
             seq_num = max(seq_nums) if seq_nums else 0
             timestamp = max(timestamps) if timestamps else 0
             pkt = TelemetryPacket(
@@ -247,6 +251,42 @@ def chunk_packets(packets: List[TelemetryPacket]) -> List[TelemetryPacket]:
             result.append(pkt)
 
     return result
+
+
+#function used by client
+def send_packet(packets: List[TelemetryPacket], batching: Optional[bool] = None) -> List[bytes]:
+
+    if batching is None:
+        batching = BATCHING_ENABLED
+
+    #no batching so call encode packet function
+    if not batching:
+        out = []
+        for p in packets:
+            out.append(encode_packet(p))
+        
+        return out
+    
+    #batching enabled
+    groups: Dict[int, List[TelemetryPacket]] = {}
+    for p in packets:
+        if p.msg_type != MSG_DATA:
+            raise ValueError("SHould be DATA packets")
+        
+        groups.setdefault(p.device_id, []).append(p)
+    
+    out_bytes: List[bytes] = []
+    for device_id, plist in groups.items():
+        try:
+            batched = batch_packets(plist)
+            out_bytes.append(encode_packet(batched))
+        except ValueError:
+            # batching created a packet too large thne call chunk packets
+            chunks = chunk_packets(plist)
+            for c in chunks:
+                out_bytes.append(encode_packet(c))
+
+    return out_bytes    
 
 
 #main function testing 

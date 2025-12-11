@@ -1,4 +1,4 @@
-from typing import List 
+from typing import List, Dict, Optional
 import struct
 import math
 
@@ -36,8 +36,6 @@ class TelemetryPacket:
 
 
 
-
-
 #encoding functions
 def encode_header(version, msg_type, device_id, seq_num, timestamp):    
     return struct.pack('!BBHII', version, msg_type, device_id, seq_num, timestamp)
@@ -57,7 +55,7 @@ def encode_packet(packet: TelemetryPacket):
     if packet.msg_type not in (MSG_INIT, MSG_DATA, MSG_HEARTBEAT):
         raise ValueError(f"Unknown message type: {packet.msg_type}")
 
-    if packet.device_id <= 0 or packet.device_id >= 0xFFFF:
+    if packet.device_id <= 0 or packet.device_id > 0xFFFF:
         raise ValueError(f"Invalid device ID: {packet.device_id}")
 
     if packet.seq_num is None or packet.seq_num < 0:
@@ -117,8 +115,6 @@ def encode_packet(packet: TelemetryPacket):
 
 
 
-
-
 #decoding functions
 
 def decode_header(data):
@@ -133,7 +129,7 @@ def decode_reading(data):
 def decode_packet(data):
     #1 Decode the 12-byte header
     version, msg_type, device_id, seq_num, timestamp = decode_header(data)
-#written like this bc decode header returns a tuple of 5 values
+    #written like this bc decode header returns a tuple of 5 values
 
     # Step 2: Prepare to store readings
     readings = []
@@ -155,6 +151,102 @@ def decode_packet(data):
 
 
 
+
+#batching functions
+def create_reading_packet(sensor_type: int, value: float, device_id: int, seq_num: int, timestamp: int) -> TelemetryPacket:
+    #create a DATA packet containing one sensor reading
+    reading = SensorReading(sensor_type, value)
+    return TelemetryPacket(
+        version = VERSION,
+        msg_type = MSG_DATA,
+        device_id = device_id,
+        seq_num = seq_num,
+        timestamp = timestamp,
+        readings = [reading]
+    )
+
+def batch_packet(packets: List[TelemetryPacket]) -> TelemetryPacket:
+    #merge N DATA packets in one packet when batching is ON
+    if not packets:
+        raise ValueError("No packets are present for batching")
+    
+    for idx, p in enumerate(packets):
+        if p.msg_type != MSG_DATA:
+            raise ValueError(f"Packet {idx} is not DATA so cannot batch {p.msg_type}")
+
+    #error if readings to be batched not from the same device
+    device_ids = {p.device_id for p in packets}
+    if len(device_ids) != 1:
+        raise ValueError("Can only batch packets from the same device id")
+    
+    combined_readings: List[SensorReading] = []
+    for p in packets:
+        combined_readings.extend(p.readings)
+
+    device_id = packets[0].device_id
+    seq_num = max((p.seq_num for p in packets if p.seq_num is not None), default = 0)
+    timestamp = max((p.timestamp for p in packets if p.timestamp is not None), default = 0)
+
+    size = HEADER_SIZE + 1 + len(combined_readings) * READING_SIZE
+    if size > PAYLOAD_LIMIT:
+        raise ValueError(f"Batched packet exceeds payload limit ({size} > {PAYLOAD_LIMIT})")
+    
+    return TelemetryPacket(
+        version=VERSION,
+        msg_type=MSG_DATA,
+        device_id=device_id,
+        seq_num=seq_num,
+        timestamp=timestamp,
+        readings=combined_readings
+    )
+
+def chunk_packets(packets: List[TelemetryPacket]) -> List[TelemetryPacket]:
+    if not packets:
+        return[]
+
+    for idx, p in enumerate(packets):
+        if p.msg_type != MSG_DATA:
+            raise ValueError(f"Packet {idx} is not DATA chunking not supported for {p.msg_type}")  
+    
+    #group packets by device id
+    groups: Dict[int, List[TelemetryPacket]] = {}
+    for p in packets:
+        groups.setdefault(p.device_id, []).append(p)
+
+
+    #calculate max reading per packet
+    result: List[TelemetryPacket] = []
+    max_packet_readings = (PAYLOAD_LIMIT - HEADER_SIZE - 1) // READING_SIZE
+    if max_packet_readings <= 0:
+        raise ValueError("PAYLOAD_LIMIT too small to fit any readings")
+    
+    #process each device's packets
+    for device_id, plist in groups.items():
+        all_readings: List[SensorReading] = []
+        seq_nums: List[int] = []
+        timestamps: List[int] = []
+        for p in plist:
+            all_readings.extend(p.readings)
+            if p.seq_num is not None:
+                seq_nums.append(p.seq_num)
+            if p.timestamp is not None:
+                timestamps.append(p.timestamp)
+
+        for i in range(0, len(all_readings), max_packet_readings):
+            chunk = all_readings[i:i + max_packet_readings]
+            seq_num = max(seq_nums) if seq_nums else 0
+            timestamp = max(timestamps) if timestamps else 0
+            pkt = TelemetryPacket(
+                version=VERSION,
+                msg_type=MSG_DATA,
+                device_id=device_id,
+                seq_num=seq_num,
+                timestamp=timestamp,
+                readings=chunk
+            )
+            result.append(pkt)
+
+    return result
 
 
 #main function testing 

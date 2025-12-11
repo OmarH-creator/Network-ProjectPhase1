@@ -9,7 +9,7 @@ import time
 import sys
 import argparse
 
-def run_client_script(script_name, device_id, host, port, interval, duration, seed=None, heartbeat_interval=None, enable_heartbeat=False, period_heartbeat=None):
+def run_client_script(script_name, device_id, host, port, interval, duration, seed=None, heartbeat_interval=None, enable_heartbeat=False, period_heartbeat=None, enable_batching=False, batching_interval=None):
     """Run a client script with specified parameters"""
     
     cmd = [
@@ -31,6 +31,11 @@ def run_client_script(script_name, device_id, host, port, interval, duration, se
         if period_heartbeat is not None:
             cmd.extend(["--period-heartbeat", str(period_heartbeat)])
     
+    if enable_batching:
+        cmd.append("--enable-batching")
+        if batching_interval is not None:
+            cmd.extend(["--batching-interval", str(batching_interval)])
+    
     print(f"[LAUNCHER] Starting {script_name} with device ID {device_id}")
     
     try:
@@ -48,9 +53,9 @@ def run_client_script(script_name, device_id, host, port, interval, duration, se
         print(f"[LAUNCHER] Error running {script_name}: {e}")
         return 1
 
-def run_client_parallel(script_name, device_id, host, port, interval, duration, seed=None, heartbeat_interval=None, enable_heartbeat=False, period_heartbeat=None):
+def run_client_parallel(script_name, device_id, host, port, interval, duration, seed=None, heartbeat_interval=None, enable_heartbeat=False, period_heartbeat=None, enable_batching=False, batching_interval=None):
     """Run client in parallel thread"""
-    return run_client_script(script_name, device_id, host, port, interval, duration, seed, heartbeat_interval, enable_heartbeat, period_heartbeat)
+    return run_client_script(script_name, device_id, host, port, interval, duration, seed, heartbeat_interval, enable_heartbeat, period_heartbeat, enable_batching, batching_interval)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -75,6 +80,9 @@ Examples:
   
   # Run with heartbeat enabled (keep-alive functionality)
   python sensor_launcher.py --all --enable-heartbeat --heartbeat-interval 5.0 --period-heartbeat 2.0
+  
+  # Run with batching enabled (multiple readings per packet)
+  python sensor_launcher.py --all --enable-batching --batching-interval 15.0 --interval 1.0
   
   # Run with custom device IDs
   python sensor_launcher.py --temp --temp-id 4001 --humid --humid-id 4002
@@ -104,6 +112,10 @@ Examples:
     parser.add_argument("--heartbeat-interval", type=float, default=10.0, help="Heartbeat interval when idle (default: 10.0s)")
     parser.add_argument("--period-heartbeat", type=float, default=3.0, help="Period between heartbeats during idle time (default: 3.0s)")
     parser.add_argument("--enable-heartbeat", action="store_true", help="Enable heartbeat functionality")
+    
+    # Batching settings
+    parser.add_argument("--enable-batching", action="store_true", help="Enable batching mode (collect multiple readings per packet)")
+    parser.add_argument("--batching-interval", type=float, default=10.0, help="Interval between batch sends (default: 10.0s)")
     
     # Seeds for reproducibility
     parser.add_argument("--temp-seed", type=int, help="Temperature client seed")
@@ -164,6 +176,11 @@ Examples:
         print(f"Heartbeat: Enabled, idle threshold: {args.heartbeat_interval}s, period: {args.period_heartbeat}s")
     else:
         print("Heartbeat: Disabled")
+    
+    if args.enable_batching:
+        print(f"Batching: Enabled, batch interval: {args.batching_interval}s")
+    else:
+        print("Batching: Disabled")
     print()
     print("Clients to run:")
     for client in clients_to_run:
@@ -192,7 +209,8 @@ Examples:
                 client['script'], client['device_id'], 
                 args.server_host, args.server_port,
                 args.interval, args.duration, client['seed'],
-                args.heartbeat_interval, args.enable_heartbeat, args.period_heartbeat
+                args.heartbeat_interval, args.enable_heartbeat, args.period_heartbeat,
+                args.enable_batching, args.batching_interval
             )
     else:
         # Run clients in parallel
@@ -205,7 +223,8 @@ Examples:
                 args=(client['script'], client['device_id'], 
                       args.server_host, args.server_port,
                       args.interval, args.duration, client['seed'],
-                      args.heartbeat_interval, args.enable_heartbeat, args.period_heartbeat)
+                      args.heartbeat_interval, args.enable_heartbeat, args.period_heartbeat,
+                      args.enable_batching, args.batching_interval)
             )
             thread.start()
             threads.append(thread)

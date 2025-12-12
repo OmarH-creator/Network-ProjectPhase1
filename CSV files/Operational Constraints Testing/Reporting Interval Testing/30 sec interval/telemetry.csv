@@ -1,0 +1,43 @@
+Timestamp,Precise_Time,Device_ID,Seq_Num,Msg_Type,Temp_C,Humid_Pct,Volt_V
+2025-12-12 18:17:50.642410,1765556270.642410,3002,0,INIT,<null>,<null>,<null>
+2025-12-12 18:17:50.643894,1765556270.643894,3001,0,INIT,<null>,<null>,<null>
+2025-12-12 18:17:50.650035,1765556270.650035,3003,0,INIT,<null>,<null>,<null>
+2025-12-12 18:18:20.652307,1765556300.652307,3001,1,DATA,25.49,<null>,<null>
+2025-12-12 18:18:20.652749,1765556300.652749,3002,1,DATA,<null>,42.45,<null>
+2025-12-12 18:18:20.659091,1765556300.659091,3003,1,DATA,<null>,<null>,4.01
+2025-12-12 18:18:50.657448,1765556330.657448,3002,2,DATA,<null>,81.33,<null>
+2025-12-12 18:18:50.658362,1765556330.658362,3001,2,DATA,24.60,<null>,<null>
+2025-12-12 18:18:50.666363,1765556330.666363,3003,2,DATA,<null>,<null>,3.78
+2025-12-12 18:19:20.661417,1765556360.661417,3002,3,DATA,<null>,83.50,<null>
+2025-12-12 18:19:20.661819,1765556360.661819,3001,3,DATA,28.61,<null>,<null>
+2025-12-12 18:19:20.668391,1765556360.668391,3003,3,DATA,<null>,<null>,3.08
+,,,,,,,
+=== PHASE 2 METRICS REPORT ===,,,,,,,
+,,,,,,,
+METRIC,VALUE,UNIT,,,,,
+bytes_per_report,17.50,bytes,,,,,
+packets_received,12,count,,,,,
+duplicate_rate,0.000,percent,,,,,
+sequence_gap_count,0,count,,,,,
+cpu_ms_per_report,10555.531,milliseconds (estimated),,,,,
+,,,,,,,
+=== ADDITIONAL METRICS ===,,,,,,,
+duration_seconds,126.7,seconds,,,,,
+packets_per_second,0.1,packets/sec,,,,,
+bytes_per_second,1.7,bytes/sec,,,,,
+total_bytes_received,210,bytes,,,,,
+,,,,,,,
+=== PER-DEVICE STATISTICS ===,,,,,,,
+Device_ID,Packets,Duplicates,Dup_Rate_%,Gaps,Bytes,,
+3001,0,0,0.0,0,0,,
+3002,0,0,0.0,0,0,,
+3003,0,0,0.0,0,0,,
+,,,,,,,
+=== PHASE 2 COMPLIANCE ===,,,,,,,
+Check,Status,Threshold,,,,,
+Duplicate rate <= 1%,PASS,<= 1%,,,,,
+Packets received > 0,PASS,> 0,,,,,
+No critical gaps,PASS,< 5% of packets,,,,,
+,,,,,,,
+OVERALL STATUS,COMPLIANT,,,,,,
+Report generated,2025-12-12 18:19:51,,,,,,

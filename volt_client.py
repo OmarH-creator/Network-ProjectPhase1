@@ -13,7 +13,7 @@ import os
 # Add Network-ProjectPhase1 to path
 sys.path.append("")
 
-from protocol import (
+from protocol_M_M import (
     VERSION, MSG_INIT, MSG_DATA, MSG_HEARTBEAT, SENSOR_VOLT,
     TelemetryPacket, SensorReading, encode_packet
 )
@@ -58,7 +58,7 @@ class VoltageClient:
     def send_init(self):
         packet = TelemetryPacket(
             VERSION, MSG_INIT, self.device_id,
-            self.seq, int(time.time()), []
+            self.seq, int(time.time()), [], flags=0
         )
         self.sock.sendto(encode_packet(packet), (self.host, self.port))
         print(f"[VOLT CLIENT {self.device_id}] INIT seq={self.seq}")
@@ -68,7 +68,7 @@ class VoltageClient:
         """Send heartbeat message to indicate client is alive"""
         packet = TelemetryPacket(
             VERSION, MSG_HEARTBEAT, self.device_id,
-            self.seq, int(time.time()), []  # Empty readings for heartbeat
+            self.seq, int(time.time()), [], flags=0  # Empty readings for heartbeat
         )
         self.sock.sendto(encode_packet(packet), (self.host, self.port))
         print(f"[VOLT CLIENT {self.device_id}] HEARTBEAT seq={self.seq}")
@@ -87,7 +87,7 @@ class VoltageClient:
 
         packet = TelemetryPacket(
             VERSION, MSG_DATA, self.device_id,
-            self.seq, int(time.time()), readings
+            self.seq, int(time.time()), readings, flags=0
         )
         self.sock.sendto(encode_packet(packet), (self.host, self.port))
         print(f"[VOLT CLIENT {self.device_id}] DATA seq={self.seq}, voltage={reading.value:.2f}V")
@@ -112,7 +112,7 @@ class VoltageClient:
         
         packet = TelemetryPacket(
             VERSION, MSG_DATA, self.device_id,
-            self.seq, int(time.time()), self.batch_readings.copy()
+            self.seq, int(time.time()), self.batch_readings.copy(), flags=0x01  # FLAG_BATCHING
         )
         self.sock.sendto(encode_packet(packet), (self.host, self.port))
         

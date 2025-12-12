@@ -1,0 +1,13 @@
+File Naming Key:::::
+
+SEQ = Sequential Client Run
+HB = Heartbeat Working
+B = Batching Working 
+All = All Clients Working
+T = Temperature Client Only
+V = Voltage CLient Only
+H = Humidity CLient Only
+
+Example File Name:
+
+SEQ_HB_T_V == " Sequetial with heartbeat on running on both temp and volt clients " 

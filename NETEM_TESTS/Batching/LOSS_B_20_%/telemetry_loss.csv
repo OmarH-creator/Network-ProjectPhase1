@@ -1,0 +1,47 @@
+Timestamp,Precise_Time,Device_ID,Seq_Num,Msg_Type,Is_Duplicate,Is_Gap,Temp_C,Humid_Pct,Volt_V
+2025-12-13 15:57:39.793272,1765634259.793272,3003,0,INIT,0,0,<null>,<null>,<null>
+2025-12-13 15:57:39.793699,1765634259.793699,3001,0,INIT,0,0,<null>,<null>,<null>
+2025-12-13 15:57:42.798693,1765634262.798693,3001,1,DATA,0,0,27.15,<null>,<null>
+2025-12-13 15:57:42.799822,1765634262.799822,3003,1,DATA,0,0,<null>,<null>,3.61
+2025-12-13 15:57:45.803171,1765634265.803171,3003,2,DATA,0,0,<null>,<null>,3.99
+2025-12-13 15:57:48.808617,1765634268.808617,3003,3,DATA,0,0,<null>,<null>,4.08
+2025-12-13 15:57:51.812900,1765634271.812900,3003,4,DATA,0,0,<null>,<null>,4.36
+2025-12-13 15:57:54.817550,1765634274.817550,3003,5,DATA,0,0,<null>,<null>,4.22
+2025-12-13 15:57:54.818790,1765634274.819283,3001,2,DATA,0,1,26.09,<null>,<null>
+2025-12-13 15:57:48.807716,1765634268.807716,3001,3,DATA,False,False,25.84,<null>,<null>
+2025-12-13 15:57:51.812272,1765634271.812272,3001,4,DATA,False,False,24.97,<null>,<null>
+2025-12-13 15:58:06.910709,1765634286.913081,3003,6,DATA,0,1,<null>,<null>,3.27
+2025-12-13 15:58:00.825715,1765634280.825715,3003,7,DATA,False,False,<null>,<null>,4.18
+2025-12-13 15:58:06.914673,1765634286.915151,3001,5,DATA,0,1,24.54,<null>,<null>
+2025-12-13 15:58:06.914673,1765634286.915264,3001,6,DATA,0,1,25.70,<null>,<null>
+2025-12-13 15:58:00.827004,1765634280.827004,3001,7,DATA,False,False,24.14,<null>,<null>
+2025-12-13 15:58:03.830729,1765634283.830729,3001,8,DATA,False,False,25.77,<null>,<null>
+,,,,,,,
+=== PHASE 2 METRICS REPORT ===,,,,,,,
+,,,,,,,
+METRIC,VALUE,UNIT,,,,,
+bytes_per_report,38.59,bytes,,,,,
+packets_received,17,count,,,,,
+duplicate_rate,0.000,percent,,,,,
+sequence_gap_count,4,count,,,,,
+cpu_ms_per_report,2296.889,milliseconds (estimated),,,,,
+,,,,,,,
+=== ADDITIONAL METRICS ===,,,,,,,
+duration_seconds,39.0,seconds,,,,,
+packets_per_second,0.4,packets/sec,,,,,
+bytes_per_second,16.8,bytes/sec,,,,,
+total_bytes_received,656,bytes,,,,,
+,,,,,,,
+=== PER-DEVICE STATISTICS ===,,,,,,,
+Device_ID,Packets,Duplicates,Dup_Rate_%,Gaps,Bytes,,
+3001,8,0,0.0,3,306,,
+3003,9,0,0.0,1,350,,
+,,,,,,,
+=== PHASE 2 COMPLIANCE ===,,,,,,,
+Check,Status,Threshold,,,,,
+Duplicate rate <= 1%,PASS,<= 1%,,,,,
+Packets received > 0,PASS,> 0,,,,,
+No critical gaps,FAIL,< 5% of packets,,,,,
+,,,,,,,
+OVERALL STATUS,NON-COMPLIANT,,,,,,
+Report generated,2025-12-13 15:58:16,,,,,,

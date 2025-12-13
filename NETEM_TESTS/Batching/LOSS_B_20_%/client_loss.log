@@ -1,0 +1,172 @@
+======================================================================
+SENSOR CLIENT LAUNCHER
+======================================================================
+Server: 127.0.0.1:5000
+Duration: 30.0s, Interval: 0.5s
+Execution mode: Parallel
+Heartbeat: Disabled
+Batching: Enabled, batch interval: 3.0s
+
+Clients to run:
+  - Temperature Client (ID: 3001) (default seed)
+  - Voltage Client (ID: 3003) (default seed)
+======================================================================
+
+Make sure server is running:
+  python Network-ProjectPhase1/server.py --port 5000 --log-file sensor_test.csv
+
+Press Enter when server is ready (Ctrl+C to cancel)...
+[LAUNCHER] Starting 2 clients in parallel...
+[LAUNCHER] Starting temp_client.py with device ID 3001
+[LAUNCHER] Starting volt_client.py with device ID 3003
+[TEMP CLIENT 3001] Using default seed: 13001[VOLT CLIENT 3003] Using default seed: 33003
+[VOLT CLIENT 3003] Batching enabled: 3.0s batch interval, max 37 readings/packet
+[VOLT CLIENT 3003] Starting voltage sensor for 30.0s
+[VOLT CLIENT 3003] INIT seq=0
+[TEMP CLIENT 3001] Batching enabled: 3.0s batch interval, max 37 readings/packet
+[TEMP CLIENT 3001] Starting temperature sensor for 30.0s
+[VOLT CLIENT 3003] Running in BATCHING mode
+[VOLT CLIENT 3003] Added to batch: voltage=4.01V (batch size: 1)
+[TEMP CLIENT 3001] INIT seq=0
+[TEMP CLIENT 3001] Running in BATCHING mode
+[TEMP CLIENT 3001] Added to batch: temp=25.49°C (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=24.60°C (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=3.78V (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=3.08V (batch size: 3)
+[VOLT CLIENT 3003] Added to batch: voltage=3.29V (batch size: 4)
+[VOLT CLIENT 3003] Added to batch: voltage=3.90V (batch size: 5)
+[TEMP CLIENT 3001] Added to batch: temp=28.61°C (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=29.08°C (batch size: 4)
+[TEMP CLIENT 3001] Added to batch: temp=27.95°C (batch size: 5)
+[VOLT CLIENT 3003] BATCH seq=1, 5 readings, voltage avg=3.61V (min=3.08, max=4.01)
+[VOLT CLIENT 3003] Added to batch: voltage=4.21V (batch size: 1)
+
+[TEMP CLIENT 3001] BATCH seq=1, 5 readings, temp avg=27.15°C (min=24.60, max=29.08)
+[TEMP CLIENT 3001] Added to batch: temp=20.83°C (batch size: 1)
+[VOLT CLIENT 3003] Added to batch: voltage=3.18V (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=3.62V (batch size: 3)[TEMP CLIENT 3001] Added to batch: temp=27.16°C (batch size: 2)
+[TEMP CLIENT 3001] Added to batch: temp=26.77°C (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=23.87°C (batch size: 4)
+[TEMP CLIENT 3001] Added to batch: temp=28.93°C (batch size: 5)
+[VOLT CLIENT 3003] Added to batch: voltage=4.35V (batch size: 4)
+[VOLT CLIENT 3003] Added to batch: voltage=3.89V (batch size: 5)
+[VOLT CLIENT 3003] Added to batch: voltage=4.69V (batch size: 6)
+[VOLT CLIENT 3003] BATCH seq=2, 6 readings, voltage avg=3.99V (min=3.18, max=4.69)
+[VOLT CLIENT 3003] Added to batch: voltage=3.47V (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=28.11°C (batch size: 6)
+[TEMP CLIENT 3001] BATCH seq=2, 6 readings, temp avg=25.95°C (min=20.83, max=28.93)
+[VOLT CLIENT 3003] Added to batch: voltage=3.63V (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=4.32V (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=24.22°C (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=26.83°C (batch size: 2)
+
+[VOLT CLIENT 3003] Added to batch: voltage=3.25V (batch size: 4)
+[VOLT CLIENT 3003] Added to batch: voltage=5.24V (batch size: 5)[TEMP CLIENT 3001] Added to batch: temp=22.41°C (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=29.36°C (batch size: 4)
+[TEMP CLIENT 3001] Added to batch: temp=24.53°C (batch size: 5)
+[TEMP CLIENT 3001] Added to batch: temp=27.69°C (batch size: 6)
+[TEMP CLIENT 3001] BATCH seq=3, 6 readings, temp avg=25.84°C (min=22.41, max=29.36)
+
+[VOLT CLIENT 3003] Added to batch: voltage=4.55V (batch size: 6)
+[VOLT CLIENT 3003] BATCH seq=3, 6 readings, voltage avg=4.08V (min=3.25, max=5.24)
+[VOLT CLIENT 3003] Added to batch: voltage=5.09V (batch size: 1)
+[VOLT CLIENT 3003] Added to batch: voltage=4.56V (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=3.17V (batch size: 3)
+[VOLT CLIENT 3003] Added to batch: voltage=3.73V (batch size: 4)
+[VOLT CLIENT 3003] Added to batch: voltage=5.37V (batch size: 5)
+[VOLT CLIENT 3003] Added to batch: voltage=4.23V (batch size: 6)
+[VOLT CLIENT 3003] BATCH seq=4, 6 readings, voltage avg=4.36V (min=3.17, max=5.37)
+[VOLT CLIENT 3003] Added to batch: voltage=4.63V (batch size: 1)
+[VOLT CLIENT 3003] Added to batch: voltage=4.45V (batch size: 2)[TEMP CLIENT 3001] Added to batch: temp=20.31°C (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=27.41°C (batch size: 2)
+[TEMP CLIENT 3001] Added to batch: temp=24.43°C (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=28.08°C (batch size: 4)
+[TEMP CLIENT 3001] Added to batch: temp=25.74°C (batch size: 5)
+[TEMP CLIENT 3001] Added to batch: temp=23.86°C (batch size: 6)
+
+[VOLT CLIENT 3003] Added to batch: voltage=4.86V (batch size: 3)
+[VOLT CLIENT 3003] Added to batch: voltage=3.58V (batch size: 4)
+[VOLT CLIENT 3003] Added to batch: voltage=4.37V (batch size: 5)
+[VOLT CLIENT 3003] Added to batch: voltage=3.40V (batch size: 6)
+[VOLT CLIENT 3003] BATCH seq=5, 6 readings, voltage avg=4.22V (min=3.40, max=4.86)
+[VOLT CLIENT 3003] Added to batch: voltage=3.03V (batch size: 1)
+[VOLT CLIENT 3003] Added to batch: voltage=5.39V (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=4.55V (batch size: 3)
+[VOLT CLIENT 3003] Added to batch: voltage=3.53V (batch size: 4)
+[TEMP CLIENT 3001] BATCH seq=4, 6 readings, temp avg=24.97°C (min=20.31, max=28.08)
+[TEMP CLIENT 3001] Added to batch: temp=29.62°C (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=20.69°C (batch size: 2)
+[TEMP CLIENT 3001] Added to batch: temp=27.11°C (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=24.98°C (batch size: 4)[VOLT CLIENT 3003] Added to batch: voltage=4.83V (batch size: 5)
+[VOLT CLIENT 3003] Added to batch: voltage=3.76V (batch size: 6)
+[TEMP CLIENT 3001] Added to batch: temp=29.37°C (batch size: 5)
+[TEMP CLIENT 3001] Added to batch: temp=25.65°C (batch size: 6)
+[TEMP CLIENT 3001] BATCH seq=5, 6 readings, temp avg=26.24°C (min=20.69, max=29.62)
+[VOLT CLIENT 3003] BATCH seq=6, 6 readings, voltage avg=4.18V (min=3.03, max=5.39)
+[VOLT CLIENT 3003] Added to batch: voltage=3.13V (batch size: 1)
+[VOLT CLIENT 3003] Added to batch: voltage=4.97V (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=3.93V (batch size: 3)
+[VOLT CLIENT 3003] Added to batch: voltage=3.86V (batch size: 4)
+[TEMP CLIENT 3001] Added to batch: temp=27.73°C (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=25.18°C (batch size: 2)
+[TEMP CLIENT 3001] Added to batch: temp=27.45°C (batch size: 3)
+[VOLT CLIENT 3003] Added to batch: voltage=4.27V (batch size: 5)
+[VOLT CLIENT 3003] Added to batch: voltage=4.91V (batch size: 6)
+[TEMP CLIENT 3001] Added to batch: temp=21.58°C (batch size: 4)
+[TEMP CLIENT 3001] Added to batch: temp=29.22°C (batch size: 5)
+[TEMP CLIENT 3001] Added to batch: temp=27.49°C (batch size: 6)
+[VOLT CLIENT 3003] BATCH seq=7, 6 readings, voltage avg=4.18V (min=3.13, max=4.97)
+[VOLT CLIENT 3003] Added to batch: voltage=4.05V (batch size: 1)
+[VOLT CLIENT 3003] Added to batch: voltage=3.42V (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=5.13V (batch size: 3)
+[VOLT CLIENT 3003] Added to batch: voltage=4.36V (batch size: 4)
+
+[TEMP CLIENT 3001] BATCH seq=6, 6 readings, temp avg=26.44°C (min=21.58, max=29.22)
+[TEMP CLIENT 3001] Added to batch: temp=26.38°C (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=29.03°C (batch size: 2)[VOLT CLIENT 3003] Added to batch: voltage=4.39V (batch size: 5)
+[VOLT CLIENT 3003] Added to batch: voltage=4.99V (batch size: 6)
+
+[TEMP CLIENT 3001] Added to batch: temp=22.51°C (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=23.54°C (batch size: 4)
+[TEMP CLIENT 3001] Added to batch: temp=21.11°C (batch size: 5)
+[TEMP CLIENT 3001] Added to batch: temp=22.26°C (batch size: 6)
+[TEMP CLIENT 3001] BATCH seq=7, 6 readings, temp avg=24.14°C (min=21.11, max=29.03)
+[VOLT CLIENT 3003] BATCH seq=8, 6 readings, voltage avg=4.39V (min=3.42, max=5.13)
+[VOLT CLIENT 3003] Added to batch: voltage=3.63V (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=29.75°C (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=24.73°C (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=4.98V (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=3.00V (batch size: 3)
+[VOLT CLIENT 3003] Added to batch: voltage=5.35V (batch size: 4)[TEMP CLIENT 3001] Added to batch: temp=21.47°C (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=27.59°C (batch size: 4)
+
+[VOLT CLIENT 3003] BATCH seq=9, 4 readings, voltage avg=4.24V (min=3.00, max=5.35)
+[VOLT CLIENT 3003] Added to batch: voltage=4.10V (batch size: 1)[TEMP CLIENT 3001] Added to batch: temp=26.70°C (batch size: 5)
+[TEMP CLIENT 3001] Added to batch: temp=24.37°C (batch size: 6)
+
+[VOLT CLIENT 3003] Added to batch: voltage=4.85V (batch size: 2)
+[VOLT CLIENT 3003] Added to batch: voltage=4.53V (batch size: 3)[TEMP CLIENT 3001] BATCH seq=8, 6 readings, temp avg=25.77°C (min=21.47, max=29.75)
+[TEMP CLIENT 3001] Added to batch: temp=29.74°C (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=23.21°C (batch size: 2)
+[TEMP CLIENT 3001] Added to batch: temp=25.51°C (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=24.35°C (batch size: 4)
+[TEMP CLIENT 3001] BATCH seq=9, 4 readings, temp avg=25.70°C (min=23.21, max=29.74)
+[TEMP CLIENT 3001] Added to batch: temp=23.69°C (batch size: 1)
+[TEMP CLIENT 3001] Added to batch: temp=21.44°C (batch size: 2)
+[TEMP CLIENT 3001] Added to batch: temp=23.22°C (batch size: 3)
+[TEMP CLIENT 3001] Added to batch: temp=24.81°C (batch size: 4)
+
+[VOLT CLIENT 3003] Added to batch: voltage=4.73V (batch size: 4)[TEMP CLIENT 3001] Added to batch: temp=29.57°C (batch size: 5)
+[TEMP CLIENT 3001] Added to batch: temp=23.24°C (batch size: 6)
+[TEMP CLIENT 3001] Sending final batch with 6 readings
+[TEMP CLIENT 3001] BATCH seq=10, 6 readings, temp avg=24.33°C (min=21.44, max=29.57)
+
+[VOLT CLIENT 3003] Added to batch: voltage=5.03V (batch size: 5)[TEMP CLIENT 3001] Socket closed
+
+[VOLT CLIENT 3003] Added to batch: voltage=3.47V (batch size: 6)
+[VOLT CLIENT 3003] Sending final batch with 6 readings
+[VOLT CLIENT 3003] BATCH seq=10, 6 readings, voltage avg=4.45V (min=3.47, max=5.03)
+[VOLT CLIENT 3003] Socket closed
+
+[LAUNCHER] All clients completed!
+Check sensor_test.csv for results!

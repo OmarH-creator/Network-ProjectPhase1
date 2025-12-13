@@ -1,0 +1,238 @@
+[SERVER] Main CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_delay.csv
+[SERVER] Batch details CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_delay_batch_details.csv
+[SERVER] Listening on port 5000
+[CONFIG] Max buffer size: 1000 packets per device
+[CONFIG] Max gap wait time: 5 seconds
+[CONFIG] Auto-shutdown after 7s of no packets
+[SERVER] Batch details logging to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_delay_batch_details.csv
+[1] INIT device 3001
+[2] INIT device 3003
+[3] INIT device 3002
+[4] DATA 3001 seq=1 [IN-ORDER]
+[5] DATA 3003 seq=1 [IN-ORDER]
+[6] DATA 3002 seq=1 [IN-ORDER]
+[7] DATA 3003 seq=2 [IN-ORDER]
+[8] DATA 3001 seq=2 [IN-ORDER]
+[9] DATA 3002 seq=2 [IN-ORDER]
+[10] DATA 3001 seq=3 [IN-ORDER]
+[11] DATA 3002 seq=3 [IN-ORDER]
+[12] DATA 3003 seq=3 [IN-ORDER]
+[BUFFERED] Device 3002: seq=6
+[14] DATA 3001 seq=4 [IN-ORDER]
+[15] DATA 3003 seq=4 [IN-ORDER]
+[16] DATA 3002 seq=4 [IN-ORDER]
+[17] DATA 3001 seq=5 [IN-ORDER]
+[18] DATA 3002 seq=5 [IN-ORDER]
+[REORDER] releasing seq=6
+[19] DATA 3003 seq=5 [IN-ORDER]
+[20] DATA 3001 seq=6 [IN-ORDER]
+[21] DATA 3003 seq=6 [IN-ORDER]
+[22] DATA 3003 seq=7 [IN-ORDER]
+[23] DATA 3002 seq=7 [IN-ORDER]
+[BUFFERED] Device 3001: seq=8
+[25] DATA 3001 seq=7 [IN-ORDER]
+[REORDER] releasing seq=8
+[26] DATA 3003 seq=8 [IN-ORDER]
+[27] DATA 3002 seq=8 [IN-ORDER]
+[28] DATA 3001 seq=9 [IN-ORDER]
+[29] DATA 3002 seq=9 [IN-ORDER]
+[30] DATA 3003 seq=9 [IN-ORDER]
+[31] DATA 3003 seq=10 [IN-ORDER]
+[32] DATA 3002 seq=10 [IN-ORDER]
+[33] DATA 3001 seq=10 [IN-ORDER]
+[34] DATA 3003 seq=11 [IN-ORDER]
+[35] DATA 3002 seq=11 [IN-ORDER]
+[36] DATA 3001 seq=11 [IN-ORDER]
+[37] DATA 3001 seq=12 [IN-ORDER]
+[38] DATA 3002 seq=12 [IN-ORDER]
+[39] DATA 3003 seq=12 [IN-ORDER]
+[40] DATA 3002 seq=13 [IN-ORDER]
+[41] DATA 3001 seq=13 [IN-ORDER]
+[BUFFERED] Device 3001: seq=16
+[43] DATA 3003 seq=13 [IN-ORDER]
+[44] DATA 3002 seq=14 [IN-ORDER]
+[45] DATA 3001 seq=14 [IN-ORDER]
+[46] DATA 3003 seq=14 [IN-ORDER]
+[47] DATA 3002 seq=15 [IN-ORDER]
+[48] DATA 3001 seq=15 [IN-ORDER]
+[REORDER] releasing seq=16
+[49] DATA 3003 seq=15 [IN-ORDER]
+[50] DATA 3003 seq=16 [IN-ORDER]
+[METRICS] Packets: 50, Avg size: 23.0B, Duplicates: 0.00%, Gaps: 0, CPU: 234.592ms/pkt
+[51] DATA 3002 seq=16 [IN-ORDER]
+[52] DATA 3003 seq=17 [IN-ORDER]
+[BUFFERED] Device 3003: seq=19
+[BUFFERED] Device 3002: seq=19
+[55] DATA 3001 seq=17 [IN-ORDER]
+[56] DATA 3002 seq=17 [IN-ORDER]
+[BUFFERED] Device 3001: seq=20
+[BUFFERED] Device 3002: seq=20
+[59] DATA 3001 seq=18 [IN-ORDER]
+[60] DATA 3003 seq=18 [IN-ORDER]
+[REORDER] releasing seq=19
+[61] DATA 3002 seq=18 [IN-ORDER]
+[REORDER] releasing seq=19
+[REORDER] releasing seq=20
+[62] DATA 3002 seq=21 [IN-ORDER]
+[63] DATA 3001 seq=19 [IN-ORDER]
+[REORDER] releasing seq=20
+[BUFFERED] Device 3001: seq=22
+[65] DATA 3003 seq=20 [IN-ORDER]
+[66] DATA 3001 seq=21 [IN-ORDER]
+[REORDER] releasing seq=22
+[67] DATA 3003 seq=21 [IN-ORDER]
+[BUFFERED] Device 3003: seq=24
+[69] DATA 3003 seq=22 [IN-ORDER]
+[70] DATA 3002 seq=22 [IN-ORDER]
+[71] DATA 3003 seq=23 [IN-ORDER]
+[REORDER] releasing seq=24
+[72] DATA 3001 seq=23 [IN-ORDER]
+[73] DATA 3002 seq=23 [IN-ORDER]
+[74] DATA 3002 seq=24 [IN-ORDER]
+[75] DATA 3001 seq=24 [IN-ORDER]
+[76] DATA 3003 seq=25 [IN-ORDER]
+[77] DATA 3002 seq=25 [IN-ORDER]
+[78] DATA 3001 seq=25 [IN-ORDER]
+[79] DATA 3003 seq=26 [IN-ORDER]
+[80] DATA 3002 seq=26 [IN-ORDER]
+[81] DATA 3001 seq=26 [IN-ORDER]
+[82] DATA 3003 seq=27 [IN-ORDER]
+[83] DATA 3002 seq=27 [IN-ORDER]
+[84] DATA 3001 seq=27 [IN-ORDER]
+[85] DATA 3003 seq=28 [IN-ORDER]
+[86] DATA 3001 seq=28 [IN-ORDER]
+[87] DATA 3002 seq=28 [IN-ORDER]
+[88] DATA 3003 seq=29 [IN-ORDER]
+[89] DATA 3001 seq=29 [IN-ORDER]
+[90] DATA 3002 seq=29 [IN-ORDER]
+[91] DATA 3003 seq=30 [IN-ORDER]
+[92] DATA 3002 seq=30 [IN-ORDER]
+[93] DATA 3001 seq=30 [IN-ORDER]
+[94] DATA 3002 seq=31 [IN-ORDER]
+[95] DATA 3001 seq=31 [IN-ORDER]
+[96] DATA 3003 seq=31 [IN-ORDER]
+[97] DATA 3002 seq=32 [IN-ORDER]
+[98] DATA 3001 seq=32 [IN-ORDER]
+[99] DATA 3003 seq=32 [IN-ORDER]
+[BUFFERED] Device 3001: seq=35
+[METRICS] Packets: 100, Avg size: 23.5B, Duplicates: 0.00%, Gaps: 0, CPU: 204.058ms/pkt
+[BUFFERED] Device 3003: seq=35
+[102] DATA 3001 seq=33 [IN-ORDER]
+[103] DATA 3003 seq=33 [IN-ORDER]
+[104] DATA 3002 seq=33 [IN-ORDER]
+[105] DATA 3001 seq=34 [IN-ORDER]
+[REORDER] releasing seq=35
+[106] DATA 3003 seq=34 [IN-ORDER]
+[REORDER] releasing seq=35
+[107] DATA 3002 seq=34 [IN-ORDER]
+[BUFFERED] Device 3001: seq=37
+[109] DATA 3002 seq=35 [IN-ORDER]
+[110] DATA 3003 seq=36 [IN-ORDER]
+[111] DATA 3002 seq=36 [IN-ORDER]
+[112] DATA 3001 seq=36 [IN-ORDER]
+[REORDER] releasing seq=37
+[113] DATA 3003 seq=37 [IN-ORDER]
+[114] DATA 3002 seq=37 [IN-ORDER]
+[115] DATA 3001 seq=38 [IN-ORDER]
+[116] DATA 3002 seq=38 [IN-ORDER]
+[117] DATA 3003 seq=38 [IN-ORDER]
+[118] DATA 3001 seq=39 [IN-ORDER]
+[119] DATA 3002 seq=39 [IN-ORDER]
+[120] DATA 3003 seq=39 [IN-ORDER]
+[121] DATA 3002 seq=40 [IN-ORDER]
+[122] DATA 3003 seq=40 [IN-ORDER]
+[123] DATA 3001 seq=40 [IN-ORDER]
+[124] DATA 3002 seq=41 [IN-ORDER]
+[125] DATA 3001 seq=41 [IN-ORDER]
+[126] DATA 3003 seq=41 [IN-ORDER]
+[BUFFERED] Device 3003: seq=44
+[128] DATA 3003 seq=42 [IN-ORDER]
+[129] DATA 3001 seq=42 [IN-ORDER]
+[130] DATA 3002 seq=42 [IN-ORDER]
+[131] DATA 3001 seq=43 [IN-ORDER]
+[132] DATA 3002 seq=43 [IN-ORDER]
+[133] DATA 3003 seq=43 [IN-ORDER]
+[REORDER] releasing seq=44
+[134] DATA 3002 seq=44 [IN-ORDER]
+[135] DATA 3001 seq=44 [IN-ORDER]
+[136] DATA 3001 seq=45 [IN-ORDER]
+[137] DATA 3002 seq=45 [IN-ORDER]
+[138] DATA 3003 seq=45 [IN-ORDER]
+[139] DATA 3001 seq=46 [IN-ORDER]
+[140] DATA 3002 seq=46 [IN-ORDER]
+[141] DATA 3003 seq=46 [IN-ORDER]
+[142] DATA 3003 seq=47 [IN-ORDER]
+[143] DATA 3002 seq=47 [IN-ORDER]
+[144] DATA 3001 seq=47 [IN-ORDER]
+[145] DATA 3001 seq=48 [IN-ORDER]
+[146] DATA 3003 seq=48 [IN-ORDER]
+[147] DATA 3002 seq=48 [IN-ORDER]
+[148] DATA 3003 seq=49 [IN-ORDER]
+[149] DATA 3001 seq=49 [IN-ORDER]
+[150] DATA 3002 seq=49 [IN-ORDER]
+[METRICS] Packets: 150, Avg size: 23.7B, Duplicates: 0.00%, Gaps: 0, CPU: 192.198ms/pkt
+[151] DATA 3001 seq=50 [IN-ORDER]
+[152] DATA 3002 seq=50 [IN-ORDER]
+[153] DATA 3003 seq=50 [IN-ORDER]
+[154] DATA 3003 seq=51 [IN-ORDER]
+[155] DATA 3002 seq=51 [IN-ORDER]
+[BUFFERED] Device 3001: seq=52
+[157] DATA 3001 seq=51 [IN-ORDER]
+[REORDER] releasing seq=52
+[158] DATA 3002 seq=52 [IN-ORDER]
+[159] DATA 3003 seq=52 [IN-ORDER]
+[160] DATA 3001 seq=53 [IN-ORDER]
+[161] DATA 3003 seq=53 [IN-ORDER]
+[162] DATA 3002 seq=53 [IN-ORDER]
+[163] DATA 3003 seq=54 [IN-ORDER]
+[BUFFERED] Device 3001: seq=56
+[165] DATA 3002 seq=54 [IN-ORDER]
+[166] DATA 3001 seq=54 [IN-ORDER]
+[167] DATA 3003 seq=55 [IN-ORDER]
+[BUFFERED] Device 3002: seq=57
+[BUFFERED] Device 3003: seq=57
+[170] DATA 3002 seq=55 [IN-ORDER]
+[171] DATA 3001 seq=55 [IN-ORDER]
+[REORDER] releasing seq=56
+[172] DATA 3003 seq=56 [IN-ORDER]
+[REORDER] releasing seq=57
+[173] DATA 3002 seq=56 [IN-ORDER]
+[REORDER] releasing seq=57
+[174] DATA 3001 seq=57 [IN-ORDER]
+[175] DATA 3001 seq=58 [IN-ORDER]
+[176] DATA 3002 seq=58 [IN-ORDER]
+[177] DATA 3003 seq=58 [IN-ORDER]
+
+[SERVER] Auto-shutdown: No packets for 7s
+
+[SERVER] Finalizing metrics...
+[SERVER] Batch details saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_delay_batch_details.csv
+
+======================================================================
+PHASE 2 METRICS REPORT
+======================================================================
+bytes_per_report:     23.73 bytes
+packets_received:     177
+duplicate_rate:       0.000%
+sequence_gap_count:   0
+cpu_ms_per_report:    228.020 ms (estimated)
+
+Additional Performance Metrics:
+Duration:             40.4 seconds
+Packets per second:   4.4
+Bytes per second:     104.1
+Total bytes received: 4200
+
+Per-Device Statistics:
+  Device 3001: 59 packets, 0 duplicates (0.0%), 0 gaps, 1400 bytes
+  Device 3003: 59 packets, 0 duplicates (0.0%), 0 gaps, 1400 bytes
+  Device 3002: 59 packets, 0 duplicates (0.0%), 0 gaps, 1400 bytes
+
+Phase 2 Compliance:
+  Duplicate rate <= 1%: PASS
+  Packets received > 0: PASS
+  No critical gaps: PASS
+
+Overall Status: COMPLIANT
+======================================================================
+[SERVER] Metrics saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_delay.csv

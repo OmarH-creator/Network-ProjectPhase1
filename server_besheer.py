@@ -44,6 +44,8 @@ class Server:
             'packets': 0,
             'duplicates': 0,
             'gaps': 0,
+            "total_gaps": 0,  # <--- FIX
+            "total_gap_packets": 0,  # <--- optional but recommended
             'bytes': 0,
             'buffer': OrderedDict(),
             'last_values': None,
@@ -90,7 +92,7 @@ class Server:
             self.telemetry_file = f
             writer = csv.writer(f)
 
-            writer.writerow(['Timestamp', 'Precise_Time', 'Device_ID', 'Seq_Num', 'Msg_Type', 'Temp_C', 'Humid_Pct', 'Volt_V'])
+            writer.writerow(['Timestamp', 'Precise_Time', 'Device_ID', 'Seq_Num', 'Msg_Type','Is_Duplicate', 'Is_Gap', 'Temp_C', 'Humid_Pct', 'Volt_V'])
             self.telemetry_file.flush()
 
             try:
@@ -104,6 +106,7 @@ class Server:
                         self.last_packet_time = arrival_time  # Update last packet time
                         
                         # Update metrics
+
                         packet_size = len(data)
                         self.total_bytes_received += packet_size
                         self.packets_received += 1
@@ -114,7 +117,7 @@ class Server:
                             
                             # Update device state metrics (device_state created automatically by defaultdict)
                             
-                            self._process_telemetry(packet, timestamp, arrival_time, writer)
+                            self._process_telemetry(packet, timestamp, arrival_time, writer,packet_size)
                             
                             # Measure CPU time for this packet (basic timing)
                             cpu_end = time.perf_counter()
@@ -152,16 +155,23 @@ class Server:
         self.finalize_and_save_metrics()
         self.sock.close()
 
-    def _process_telemetry(self, packet, timestamp, arrival_time, writer):
+    def _process_telemetry(self, packet, timestamp, arrival_time, writer,packet_size):
         timestamp_str = datetime.fromtimestamp(arrival_time).strftime('%Y-%m-%d %H:%M:%S.%f')
         precise_time = f"{arrival_time:.6f}"  # Unix timestamp with 6 decimal places
 
         # Device state is automatically created by defaultdict
 
         device_state = self.device_states[packet.device_id]
+
+        # --- FIX: INCREMENT COUNTERS HERE ---
+        device_state['packets'] += 1
+        device_state['bytes'] += packet_size
+        # ------------------------------------
+
         buffer = device_state['buffer']
         current_seq = packet.seq_num
         last_seq = device_state['last_seq']
+
 
         # --- INIT Message ---
         if packet.msg_type != MSG_DATA:
@@ -171,21 +181,71 @@ class Server:
                 device_state['last_values'] = None  # Reset values
                 device_state['gap_start_time'] = None
 
-                writer.writerow([timestamp_str, precise_time, packet.device_id, packet.seq_num, 'INIT', '<null>', '<null>', '<null>'])
+                writer.writerow([timestamp_str, precise_time, packet.device_id, packet.seq_num, 'INIT',0, 0, '<null>', '<null>', '<null>'])
                 self.telemetry_file.flush()
 
                 self._process_buffered_packets(packet.device_id, timestamp, writer)
                 return
 
             if packet.msg_type == MSG_HEARTBEAT:
-                print(f"[{self.packet_count}] HEARTBEAT device {packet.device_id}")
-                device_state['last_seq'] = packet.seq_num
-                device_state['last_values'] = None  # Reset values
+
+                last_seq = device_state['last_seq']
+                current_seq = packet.seq_num
+                is_duplicate = 0
+                is_gap = 0
+
+                # --- DUPLICATE HEARTBEAT ---
+                if last_seq != -1 and current_seq <= last_seq:
+                    is_duplicate = 1
+
+                    device_state['duplicates'] += 1
+                    self.duplicate_count += 1
+
+                    writer.writerow([
+                        timestamp_str, precise_time, packet.device_id,
+                        packet.seq_num, 'HEARTBEAT',is_duplicate, is_gap,
+                        '<null>', '<null>', '<null>'
+                    ])
+                    self.telemetry_file.flush()
+
+                    return
+
+                # --- GAP CAUSED BY HEARTBEAT ---
+                if last_seq != -1:
+                    expected_next = last_seq + 1
+                    if current_seq > expected_next:
+                        is_gap = 1
+                        gap_size = current_seq - expected_next
+
+                        print(
+                            f"[{self.packet_count}] GAP DETECTED on device {packet.device_id}: missing seq {expected_next} → {current_seq - 1} ({gap_size})")
+
+                        device_state['gaps'] += 1
+                        device_state['total_gap_packets'] += gap_size  # FIXED
+                        self.total_gap_count += 1
+                        self.total_gap_packet_loss += gap_size
+
+                        writer.writerow([
+                            timestamp_str, precise_time, packet.device_id,
+                            packet.seq_num, 'HEARTBEAT',is_duplicate, is_gap,
+                            '<null>', '<null>', '<null>'
+                        ])
+                        # DO NOT interpolate HB packet
+
+                # --- NORMAL HEARTBEAT ---
+                device_state['last_seq'] = current_seq
+                # KEEP last_values (do NOT erase it)
                 device_state['gap_start_time'] = None
-                
-                # Log HEARTBEAT to main CSV (like old server)
-                writer.writerow([timestamp_str, precise_time, packet.device_id, packet.seq_num, 'HEARTBEAT', '<null>', '<null>', '<null>'])
+
+                writer.writerow([
+                    timestamp_str, precise_time, packet.device_id,
+                    packet.seq_num, 'HEARTBEAT',is_duplicate, is_gap,
+                    '<null>', '<null>', '<null>',
+
+                ])
                 self.telemetry_file.flush()
+                return
+
 
 
         else:
@@ -195,13 +255,13 @@ class Server:
                 print(f"[{self.packet_count}] DATA {packet.device_id} seq={current_seq} [DUPLICATE]")
                 device_state['duplicates'] += 1
                 self.duplicate_count += 1
-                self._log_data_packet(packet, timestamp_str, precise_time, writer, True, False)
+                self._log_data_packet(packet, timestamp_str, precise_time, writer, 1, 0)
                 return
 
             # 2. In-Order Check
             if current_seq == last_seq + 1:
                 print(f"[{self.packet_count}] DATA {packet.device_id} seq={current_seq} [IN-ORDER]")
-                self._log_data_packet(packet, timestamp_str, precise_time, writer, False, False)
+                self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0)
 
                 # Update last_values for interpolation
                 device_state['last_values'] = self._get_packet_values(packet)
@@ -216,7 +276,7 @@ class Server:
             if device_state['gap_start_time'] is not None:
                 gap_age = (timestamp - device_state['gap_start_time']).total_seconds()
                 if gap_age > self.max_gap_wait_seconds:
-                    # TIMEOUT: We waited too long. We must fill the gap NOW.
+                    # TIMEOUT: We waited too long. We must fill the gap STAT.
                     print(f"[TIMEOUT] Filling gap after seq={last_seq}")
 
                     # Determine the 'End' of the gap.
@@ -228,16 +288,21 @@ class Server:
                         next_avail_seq = current_seq
                         next_packet = packet
 
+                    ##########################################################################################################################################################################################
+                    ##########################################################################################################################################################################################
+                    ##########################################################################################################################################################################################
+                    # MODIFIED: Dynamically determine if we are in batch mode based on the packet that ends the gap
+                    # We assume the missing packets had the same structure (batch size) as the current packet.
+                    batch_size = len(next_packet.readings)
                     # Interpolate from last_seq to next_avail_seq
                     start_vals = device_state['last_values']
-                    end_vals = self._get_packet_values(next_packet)
-
+                    end_vals = self._get_first_packet_values(next_packet)  # This now holds FIRST values of next packet (Fixed)
                     gap_size = next_avail_seq - last_seq - 1
                     device_state['gaps'] += gap_size
                     self.sequence_gaps += gap_size
 
                     self._interpolate_and_log(packet.device_id, last_seq, next_avail_seq,
-                                              start_vals, end_vals, timestamp_str, writer)
+                                              start_vals, end_vals, timestamp_str, writer,0,1,batch_size=batch_size)
 
                     # Advance state to just before the next available packet
                     device_state['last_seq'] = next_avail_seq - 1
@@ -246,7 +311,7 @@ class Server:
                     # Now process the buffered packets (or current) naturally
                     if current_seq == device_state['last_seq'] + 1:
                         # Current packet is now next
-                        self._log_data_packet(packet, timestamp_str, precise_time, writer, False, False)
+                        self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0)
                         device_state['last_values'] = self._get_packet_values(packet)
                         device_state['last_seq'] = current_seq
                     else:
@@ -288,7 +353,7 @@ class Server:
             self.batch_details_writer = csv.writer(self.batch_details_file_handle)
             # Write header for batch details
             self.batch_details_writer.writerow([
-                'Batch_Timestamp', 'Device_ID', 'Seq_Num', 'Batch_Size', 'Reading_Index', 
+                'Batch_Timestamp', 'Device_ID', 'Seq_Num','Is_Duplicate', 'Is_Gap', 'Batch_Size', 'Reading_Index',
                 'Sensor_Type', 'Value', 'Unit', 'Batch_Avg', 'Batch_Min', 'Batch_Max'
             ])
             print(f"[SERVER] Batch details logging to: {self.batch_details_file}")
@@ -296,48 +361,68 @@ class Server:
             print(f"[WARNING] Could not create batch details file: {e}")
             self.batch_details_writer = None
 
-    def log_batch_details(self, timestamp, device_id, seq_num, readings):
+    ##########################################################################################################################################################################################
+    ##########################################################################################################################################################################################
+    ##########################################################################################################################################################################################
+    # MODIFIED: Handles both Object (Real Packet) and Dictionary (Interpolation) readings
+    def log_batch_details(self, timestamp, device_id, seq_num, readings, is_dup, is_gap):
         """Log individual readings from a batch to the batch details CSV"""
         if not self.batch_details_writer or not readings:
             return
-        
-        from collections import defaultdict
-        
+
         # Group readings by sensor type for batch statistics
+        from collections import defaultdict
         sensor_groups = defaultdict(list)
+
+        # First Pass: Collect all values to calculate Averages/Min/Max
         for reading in readings:
-            sensor_groups[reading.sensor_type].append(reading.value)
-        
-        # Log each reading with batch context
+            # CHECK: Is this a dictionary (from interpolation) or object (from packet)?
+            if isinstance(reading, dict):
+                val = reading['value']
+                s_type = reading['sensor_type']
+            else:
+                val = reading.value
+                s_type = reading.sensor_type
+
+            sensor_groups[s_type].append(val)
+
+        # Second Pass: Write rows
         for i, reading in enumerate(readings):
+            # CHECK: Get values again
+            if isinstance(reading, dict):
+                val = reading['value']
+                s_type = reading['sensor_type']
+            else:
+                val = reading.value
+                s_type = reading.sensor_type
+
             sensor_type_name = {
                 SENSOR_TEMP: 'TEMPERATURE',
-                SENSOR_HUM: 'HUMIDITY', 
+                SENSOR_HUM: 'HUMIDITY',
                 SENSOR_VOLT: 'VOLTAGE'
-            }.get(reading.sensor_type, f'UNKNOWN_{reading.sensor_type}')
-            
+            }.get(s_type, f'UNKNOWN_{s_type}')
+
             unit = {
                 SENSOR_TEMP: '°C',
                 SENSOR_HUM: '%',
                 SENSOR_VOLT: 'V'
-            }.get(reading.sensor_type, '')
-            
+            }.get(s_type, '')
+
             # Calculate batch statistics for this sensor type
-            sensor_values = sensor_groups[reading.sensor_type]
+            sensor_values = sensor_groups[s_type]
             batch_avg = sum(sensor_values) / len(sensor_values)
             batch_min = min(sensor_values)
             batch_max = max(sensor_values)
-            
+
             self.batch_details_writer.writerow([
-                timestamp, device_id, seq_num, len(readings), i + 1,
-                sensor_type_name, f"{reading.value:.3f}", unit,
+                timestamp, device_id, seq_num, int(is_dup), int(is_gap), len(readings), i + 1,
+                sensor_type_name, f"{val:.3f}", unit,
                 f"{batch_avg:.3f}", f"{batch_min:.3f}", f"{batch_max:.3f}"
             ])
-        
+
         # Flush to ensure data is written
         if self.batch_details_file_handle:
             self.batch_details_file_handle.flush()
-
     def _process_buffered_packets(self, device_id, timestamp, writer):
         device_state = self.device_states[device_id]
         buffer = device_state['buffer']
@@ -373,11 +458,16 @@ class Server:
                 first_buff_seq = next(iter(buffer))
                 first_buff_packet = buffer[first_buff_seq]['packet']
 
-                start_vals = state['last_values']
-                end_vals = self._get_packet_values(first_buff_packet)
+                ##########################################################################################################################################################################################
+                ##########################################################################################################################################################################################
+                ##########################################################################################################################################################################################
+                # MODIFIED: Determine batch size from the buffered packet we are bridging to
+                batch_size = len(first_buff_packet.readings)
 
+                start_vals = state['last_values']
+                end_vals = self._get_first_packet_values(first_buff_packet)  # This now holds FIRST values of next packet (Fixed)
                 self._interpolate_and_log(device_id, state['last_seq'], first_buff_seq,
-                                          start_vals, end_vals, oldest['timestamp'], writer)
+                                          start_vals, end_vals, oldest['timestamp'], writer,0,1,batch_size=batch_size)
 
                 state['last_seq'] = first_buff_seq - 1
                 self._process_buffered_packets(device_id, current_time, writer)
@@ -400,41 +490,147 @@ class Server:
         
         return (temp, humid, volt)
 
+        ##########################################################################################################################################################################################
+        ##########################################################################################################################################################################################
+        ##########################################################################################################################################################################################
+        # NEW HELPER: Get the FIRST reading values from a packet (for interpolation target)
+    def _get_first_packet_values(self, packet):
+        temp = None
+        humid = None
+        volt = None
+
+        # We need to find the FIRST occurrence of each sensor type
+        found_sensors = set()
+
+        for reading in packet.readings:
+            if reading.sensor_type not in found_sensors:
+                if reading.sensor_type == SENSOR_TEMP:
+                    temp = reading.value
+                elif reading.sensor_type == SENSOR_HUM:
+                    humid = reading.value
+                elif reading.sensor_type == SENSOR_VOLT:
+                    volt = reading.value
+                found_sensors.add(reading.sensor_type)
+
+            # If we found all 3, we can stop early
+            if len(found_sensors) == 3:
+                break
+
+        return (temp, humid, volt)
     # --- NEW HELPER: Linear Interpolation ---
-    def _interpolate_and_log(self, device_id, start_seq, end_seq, start_vals, end_vals, timestamp_str, writer):
+    ##########################################################################################################################################################################################
+    ##########################################################################################################################################################################################
+    ##########################################################################################################################################################################################
+    # MODIFIED: Interpolation that respects missing sensors (Does not force 0s)
+    def _interpolate_and_log(self, device_id, start_seq, end_seq, start_vals, end_vals, timestamp_str, writer,
+                             is_duplicate, is_gap, batch_size=1):
         count = end_seq - start_seq - 1
         if count <= 0: return
 
         # Handle edge case: missing start values (first packet lost)
         if start_vals is None: start_vals = end_vals
 
-        print(f"   >>> Estimating {count} packets (Seq {start_seq + 1} to {end_seq - 1})")
+        # --- BRANCH: BATCH MODE (Dynamic Detection) ---
+        if batch_size > 1:
+            total_reading_steps = count * batch_size
+            print(
+                f"   >>> Estimating {count} packets ({total_reading_steps} readings) (Seq {start_seq + 1} to {end_seq - 1}) [BATCH MODE: {batch_size} r/pkt]")
 
-        # Calculate steps
-        step_t = (end_vals[0] - start_vals[0]) / (count + 1)
-        step_h = (end_vals[1] - start_vals[1]) / (count + 1)
-        step_v = (end_vals[2] - start_vals[2]) / (count + 1)
+            # 1. Safe Step Calculation
+            # We calculate steps individually. If a sensor is None, step is None.
+            steps = [None, None, None]
+            divisor = total_reading_steps + 1
 
-        current_vals = list(start_vals)
+            for i in range(3):
+                if start_vals[i] is not None and end_vals[i] is not None:
+                    steps[i] = (end_vals[i] - start_vals[i]) / divisor
+                else:
+                    steps[i] = None  # Impossible to interpolate this sensor
 
-        for i in range(count):
-            seq = start_seq + 1 + i
-            current_vals[0] += step_t
-            current_vals[1] += step_h
-            current_vals[2] += step_v
+            current_vals = list(start_vals)
 
-            # Log Estimated Packet (interpolated values)
-            temp_str = f"{current_vals[0]:.2f}" if current_vals[0] is not None else '<null>'
-            humid_str = f"{current_vals[1]:.2f}" if current_vals[1] is not None else '<null>'
-            volt_str = f"{current_vals[2]:.2f}" if current_vals[2] is not None else '<null>'
-            
-            writer.writerow([
-                timestamp_str, f"{time.time():.6f}", device_id, seq, 'DATA',
-                temp_str, humid_str, volt_str
-            ])
+            # Outer Loop: Packets
+            for pkt_idx in range(count):
+                seq = start_seq + 1 + pkt_idx
+
+                batch_temps = []
+                batch_humids = []
+                batch_volts = []
+                reconstructed_readings = []
+
+                # Inner Loop: Readings
+                for r_idx in range(batch_size):
+                    # Increment values ONLY if valid
+                    for i in range(3):
+                        if steps[i] is not None and current_vals[i] is not None:
+                            current_vals[i] += steps[i]
+
+                    # Store for averaging AND batch details
+                    # IMPORTANT: Only append if the sensor actually exists (is not None)
+                    if current_vals[0] is not None:
+                        batch_temps.append(current_vals[0])
+                        reconstructed_readings.append({'sensor_type': SENSOR_TEMP, 'value': current_vals[0]})
+
+                    if current_vals[1] is not None:
+                        batch_humids.append(current_vals[1])
+                        reconstructed_readings.append({'sensor_type': SENSOR_HUM, 'value': current_vals[1]})
+
+                    if current_vals[2] is not None:
+                        batch_volts.append(current_vals[2])
+                        reconstructed_readings.append({'sensor_type': SENSOR_VOLT, 'value': current_vals[2]})
+
+                # A. Log to Batch Details CSV
+                # This will now ONLY write rows for sensors that exist (no zeros for missing sensors)
+                self.log_batch_details(timestamp_str, device_id, seq, reconstructed_readings, is_duplicate, is_gap)
+
+                # B. Log to Main CSV (Average)
+                # Calculate avg only if we have data, otherwise None
+                avg_t = sum(batch_temps) / len(batch_temps) if batch_temps else None
+                avg_h = sum(batch_humids) / len(batch_humids) if batch_humids else None
+                avg_v = sum(batch_volts) / len(batch_volts) if batch_volts else None
+
+                # Format strings (Use <null> if None)
+                temp_str = f"{avg_t:.2f}" if avg_t is not None else '<null>'
+                humid_str = f"{avg_h:.2f}" if avg_h is not None else '<null>'
+                volt_str = f"{avg_v:.2f}" if avg_v is not None else '<null>'
+
+                writer.writerow([
+                    timestamp_str, f"{time.time():.6f}", device_id, seq, 'DATA', is_duplicate, is_gap,
+                    temp_str, humid_str, volt_str
+                ])
+
+        # --- BRANCH: NORMAL MODE ---
+        else:
+            print(f"   >>> Estimating {count} packets (Seq {start_seq + 1} to {end_seq - 1}) [NORMAL MODE]")
+
+            steps = [None, None, None]
+            divisor = count + 1
+
+            for i in range(3):
+                if start_vals[i] is not None and end_vals[i] is not None:
+                    steps[i] = (end_vals[i] - start_vals[i]) / divisor
+                else:
+                    steps[i] = None
+
+            current_vals = list(start_vals)
+
+            for i in range(count):
+                seq = start_seq + 1 + i
+
+                for k in range(3):
+                    if steps[k] is not None and current_vals[k] is not None:
+                        current_vals[k] += steps[k]
+
+                temp_str = f"{current_vals[0]:.2f}" if current_vals[0] is not None else '<null>'
+                humid_str = f"{current_vals[1]:.2f}" if current_vals[1] is not None else '<null>'
+                volt_str = f"{current_vals[2]:.2f}" if current_vals[2] is not None else '<null>'
+
+                writer.writerow([
+                    timestamp_str, f"{time.time():.6f}", device_id, seq, 'DATA', is_duplicate, is_gap,
+                    temp_str, humid_str, volt_str
+                ])
 
         if self.telemetry_file: self.telemetry_file.flush()
-
     def _log_data_packet(self, packet, timestamp_str, precise_time, writer, is_dup, is_gap):
         temp, humid, volt = self._get_packet_values(packet)
         
@@ -443,7 +639,7 @@ class Server:
         
         if is_batch:
             # Log individual readings to batch details CSV
-            self.log_batch_details(timestamp_str, packet.device_id, packet.seq_num, packet.readings)
+            self.log_batch_details(timestamp_str, packet.device_id, packet.seq_num, packet.readings,is_dup, is_gap)
             
             # Calculate averages for main CSV
             from collections import defaultdict
@@ -469,7 +665,7 @@ class Server:
             volt_str = f"{volt:.2f}" if volt is not None else '<null>'
         
         writer.writerow([
-            timestamp_str, precise_time, packet.device_id, packet.seq_num, 'DATA',
+            timestamp_str, precise_time, packet.device_id, packet.seq_num, 'DATA',is_dup,is_gap,
             temp_str, humid_str, volt_str
         ])
         if self.telemetry_file: self.telemetry_file.flush()

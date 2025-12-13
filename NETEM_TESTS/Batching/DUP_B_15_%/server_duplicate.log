@@ -1,0 +1,77 @@
+[SERVER] Main CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate.csv
+[SERVER] Batch details CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate_batch_details.csv
+[SERVER] Listening on port 5000
+[CONFIG] Max buffer size: 1000 packets per device
+[CONFIG] Max gap wait time: 5 seconds
+[CONFIG] Auto-shutdown after 7s of no packets
+[SERVER] Batch details logging to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate_batch_details.csv
+[1] INIT device 3003
+[2] INIT device 3001
+[3] INIT device 3002
+[4] DATA 3003 seq=1 [IN-ORDER]
+[5] DATA 3002 seq=1 [IN-ORDER]
+[6] DATA 3001 seq=1 [IN-ORDER]
+[7] DATA 3003 seq=2 [IN-ORDER]
+[8] DATA 3001 seq=2 [IN-ORDER]
+[9] DATA 3002 seq=2 [IN-ORDER]
+[10] DATA 3003 seq=3 [IN-ORDER]
+[11] DATA 3002 seq=3 [IN-ORDER]
+[12] DATA 3001 seq=3 [IN-ORDER]
+[13] DATA 3003 seq=4 [IN-ORDER]
+[14] DATA 3002 seq=4 [IN-ORDER]
+[15] DATA 3002 seq=4 [DUPLICATE]
+[16] DATA 3001 seq=4 [IN-ORDER]
+[17] DATA 3003 seq=5 [IN-ORDER]
+[18] DATA 3002 seq=5 [IN-ORDER]
+[19] DATA 3001 seq=5 [IN-ORDER]
+[20] DATA 3002 seq=6 [IN-ORDER]
+[21] DATA 3003 seq=6 [IN-ORDER]
+[22] DATA 3001 seq=6 [IN-ORDER]
+[23] DATA 3002 seq=7 [IN-ORDER]
+[24] DATA 3003 seq=7 [IN-ORDER]
+[25] DATA 3001 seq=7 [IN-ORDER]
+[26] DATA 3002 seq=8 [IN-ORDER]
+[27] DATA 3003 seq=8 [IN-ORDER]
+[28] DATA 3001 seq=8 [IN-ORDER]
+[29] DATA 3001 seq=8 [DUPLICATE]
+[30] DATA 3002 seq=9 [IN-ORDER]
+[31] DATA 3003 seq=9 [IN-ORDER]
+[32] DATA 3001 seq=9 [IN-ORDER]
+[33] DATA 3002 seq=10 [IN-ORDER]
+[34] DATA 3003 seq=10 [IN-ORDER]
+[35] DATA 3003 seq=10 [DUPLICATE]
+[36] DATA 3001 seq=10 [IN-ORDER]
+
+[SERVER] Auto-shutdown: No packets for 7s
+
+[SERVER] Finalizing metrics...
+[SERVER] Batch details saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate_batch_details.csv
+
+======================================================================
+PHASE 2 METRICS REPORT
+======================================================================
+bytes_per_report:     39.89 bytes
+packets_received:     36
+duplicate_rate:       8.333%
+sequence_gap_count:   0
+cpu_ms_per_report:    1086.391 ms (estimated)
+
+Additional Performance Metrics:
+Duration:             39.1 seconds
+Packets per second:   0.9
+Bytes per second:     36.7
+Total bytes received: 1436
+
+Per-Device Statistics:
+  Device 3003: 12 packets, 1 duplicates (8.3%), 0 gaps, 477 bytes
+  Device 3001: 12 packets, 1 duplicates (8.3%), 0 gaps, 482 bytes
+  Device 3002: 12 packets, 1 duplicates (8.3%), 0 gaps, 477 bytes
+
+Phase 2 Compliance:
+  Duplicate rate <= 1%: FAIL
+  Packets received > 0: PASS
+  No critical gaps: PASS
+
+Overall Status: NON-COMPLIANT
+======================================================================
+[SERVER] Metrics saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate.csv

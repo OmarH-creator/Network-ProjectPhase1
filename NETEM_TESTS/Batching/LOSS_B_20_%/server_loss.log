@@ -1,0 +1,66 @@
+[SERVER] Main CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss.csv
+[SERVER] Batch details CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss_batch_details.csv
+[SERVER] Listening on port 5000
+[CONFIG] Max buffer size: 1000 packets per device
+[CONFIG] Max gap wait time: 5 seconds
+[CONFIG] Auto-shutdown after 7s of no packets
+[SERVER] Batch details logging to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss_batch_details.csv
+[1] INIT device 3003
+[2] INIT device 3001
+[3] DATA 3001 seq=1 [IN-ORDER]
+[4] DATA 3003 seq=1 [IN-ORDER]
+[5] DATA 3003 seq=2 [IN-ORDER]
+[BUFFERED] Device 3001: seq=3
+[7] DATA 3003 seq=3 [IN-ORDER]
+[BUFFERED] Device 3001: seq=4
+[9] DATA 3003 seq=4 [IN-ORDER]
+[10] DATA 3003 seq=5 [IN-ORDER]
+[TIMEOUT] Filling gap after seq=1
+   >>> Estimating 1 packets (6 readings) (Seq 2 to 2) [BATCH MODE: 6 r/pkt]
+[REORDER] releasing seq=3
+[REORDER] releasing seq=4
+[BUFFERED] Device 3003: seq=7
+[BUFFERED] Device 3001: seq=7
+[BUFFERED] Device 3001: seq=8
+[TIMEOUT] Filling gap after seq=5
+   >>> Estimating 1 packets (6 readings) (Seq 6 to 6) [BATCH MODE: 6 r/pkt]
+[REORDER] releasing seq=7
+[BUFFERED] Device 3003: seq=9
+[TIMEOUT] Filling gap after seq=4
+   >>> Estimating 2 packets (12 readings) (Seq 5 to 6) [BATCH MODE: 6 r/pkt]
+[REORDER] releasing seq=7
+[REORDER] releasing seq=8
+[BUFFERED] Device 3003: seq=10
+
+[SERVER] Auto-shutdown: No packets for 7s
+
+[SERVER] Finalizing metrics...
+[SERVER] Batch details saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss_batch_details.csv
+
+======================================================================
+PHASE 2 METRICS REPORT
+======================================================================
+bytes_per_report:     38.59 bytes
+packets_received:     17
+duplicate_rate:       0.000%
+sequence_gap_count:   4
+cpu_ms_per_report:    2296.986 ms (estimated)
+
+Additional Performance Metrics:
+Duration:             39.0 seconds
+Packets per second:   0.4
+Bytes per second:     16.8
+Total bytes received: 656
+
+Per-Device Statistics:
+  Device 3003: 9 packets, 0 duplicates (0.0%), 1 gaps, 350 bytes
+  Device 3001: 8 packets, 0 duplicates (0.0%), 3 gaps, 306 bytes
+
+Phase 2 Compliance:
+  Duplicate rate <= 1%: PASS
+  Packets received > 0: PASS
+  No critical gaps: FAIL
+
+Overall Status: NON-COMPLIANT
+======================================================================
+[SERVER] Metrics saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss.csv

@@ -1,0 +1,1 @@
+Batch_Timestamp,Device_ID,Seq_Num,Is_Duplicate,Is_Gap,Batch_Size,Reading_Index,Sensor_Type,Value,Unit,Batch_Avg,Batch_Min,Batch_Max

@@ -1,0 +1,215 @@
+======================================================================
+SENSOR CLIENT LAUNCHER
+======================================================================
+Server: 127.0.0.1:5000
+Duration: 30.0s, Interval: 0.5s
+Execution mode: Parallel
+Heartbeat: Disabled
+Batching: Disabled
+
+Clients to run:
+  - Temperature Client (ID: 3001) (default seed)
+  - Humidity Client (ID: 3002) (default seed)
+  - Voltage Client (ID: 3003) (default seed)
+======================================================================
+
+Make sure server is running:
+  python Network-ProjectPhase1/server.py --port 5000 --log-file sensor_test.csv
+
+Press Enter when server is ready (Ctrl+C to cancel)...
+[LAUNCHER] Starting 3 clients in parallel...
+[LAUNCHER] Starting temp_client.py with device ID 3001
+[LAUNCHER] Starting humid_client.py with device ID 3002
+[LAUNCHER] Starting volt_client.py with device ID 3003
+[TEMP CLIENT 3001] Using default seed: 13001
+[TEMP CLIENT 3001] Starting temperature sensor for 30.0s
+[TEMP CLIENT 3001] INIT seq=0
+[TEMP CLIENT 3001] Running in NORMAL mode
+[TEMP CLIENT 3001] DATA seq=1, temp=25.49°C
+[TEMP CLIENT 3001] DATA seq=2, temp=24.60°C
+[TEMP CLIENT 3001] DATA seq=3, temp=28.61°C
+[TEMP CLIENT 3001] DATA seq=4, temp=29.08°C
+[TEMP CLIENT 3001] DATA seq=5, temp=27.95°C
+[TEMP CLIENT 3001] DATA seq=6, temp=20.83°C
+[TEMP CLIENT 3001] DATA seq=7, temp=27.16°C
+[TEMP CLIENT 3001] DATA seq=8, temp=26.77°C
+[TEMP CLIENT 3001] DATA seq=9, temp=23.87°C
+[TEMP CLIENT 3001] DATA seq=10, temp=28.93°C
+[TEMP CLIENT 3001] DATA seq=11, temp=28.11°C
+[TEMP CLIENT 3001] DATA seq=12, temp=24.22°C
+[TEMP CLIENT 3001] DATA seq=13, temp=26.83°C
+[TEMP CLIENT 3001] DATA seq=14, temp=22.41°C
+[VOLT CLIENT 3003] Using default seed: 33003
+[VOLT CLIENT 3003] Starting voltage sensor for 30.0s[TEMP CLIENT 3001] DATA seq=15, temp=29.36°C
+[VOLT CLIENT 3003] INIT seq=0
+[VOLT CLIENT 3003] Running in NORMAL mode
+
+[TEMP CLIENT 3001] DATA seq=16, temp=24.53°C
+[TEMP CLIENT 3001] DATA seq=17, temp=27.69°C
+[TEMP CLIENT 3001] DATA seq=18, temp=20.31°C[VOLT CLIENT 3003] DATA seq=1, voltage=4.01V
+[VOLT CLIENT 3003] DATA seq=2, voltage=3.78V
+[VOLT CLIENT 3003] DATA seq=3, voltage=3.08V
+[VOLT CLIENT 3003] DATA seq=4, voltage=3.29V
+[VOLT CLIENT 3003] DATA seq=5, voltage=3.90V
+[TEMP CLIENT 3001] DATA seq=19, temp=27.41°C
+[TEMP CLIENT 3001] DATA seq=20, temp=24.43°C
+[VOLT CLIENT 3003] DATA seq=6, voltage=4.21V
+[VOLT CLIENT 3003] DATA seq=7, voltage=3.18V
+[TEMP CLIENT 3001] DATA seq=21, temp=28.08°C
+
+[VOLT CLIENT 3003] DATA seq=8, voltage=3.62V
+[VOLT CLIENT 3003] DATA seq=9, voltage=4.35V
+[VOLT CLIENT 3003] DATA seq=10, voltage=3.89V
+[VOLT CLIENT 3003] DATA seq=11, voltage=4.69V
+[VOLT CLIENT 3003] DATA seq=12, voltage=3.47V
+[VOLT CLIENT 3003] DATA seq=13, voltage=3.63V[HUMID CLIENT 3002] Using default seed: 23002
+
+[HUMID CLIENT 3002] Starting humidity sensor for 30.0s
+[HUMID CLIENT 3002] INIT seq=0
+[HUMID CLIENT 3002] Running in NORMAL mode
+[VOLT CLIENT 3003] DATA seq=14, voltage=4.32V
+[VOLT CLIENT 3003] DATA seq=15, voltage=3.25V
+[VOLT CLIENT 3003] DATA seq=16, voltage=5.24V
+[TEMP CLIENT 3001] DATA seq=22, temp=25.74°C[VOLT CLIENT 3003] DATA seq=17, voltage=4.55V
+[TEMP CLIENT 3001] DATA seq=23, temp=23.86°C
+
+[TEMP CLIENT 3001] DATA seq=24, temp=29.62°C
+[VOLT CLIENT 3003] DATA seq=18, voltage=5.09V
+[HUMID CLIENT 3002] DATA seq=1, humidity=42.45%
+[VOLT CLIENT 3003] DATA seq=19, voltage=4.56V
+[VOLT CLIENT 3003] DATA seq=20, voltage=3.17V
+[HUMID CLIENT 3002] DATA seq=2, humidity=81.33%
+[HUMID CLIENT 3002] DATA seq=3, humidity=83.50%
+[VOLT CLIENT 3003] DATA seq=21, voltage=3.73V
+[VOLT CLIENT 3003] DATA seq=22, voltage=5.37V[HUMID CLIENT 3002] DATA seq=4, humidity=82.32%
+[VOLT CLIENT 3003] DATA seq=23, voltage=4.23V
+[HUMID CLIENT 3002] DATA seq=5, humidity=32.35%
+[HUMID CLIENT 3002] DATA seq=6, humidity=38.80%
+[HUMID CLIENT 3002] DATA seq=7, humidity=50.34%
+[HUMID CLIENT 3002] DATA seq=8, humidity=84.53%
+
+[HUMID CLIENT 3002] DATA seq=9, humidity=37.75%
+[HUMID CLIENT 3002] DATA seq=10, humidity=60.19%
+[HUMID CLIENT 3002] DATA seq=11, humidity=86.81%
+[HUMID CLIENT 3002] DATA seq=12, humidity=56.35%
+[HUMID CLIENT 3002] DATA seq=13, humidity=70.69%
+[HUMID CLIENT 3002] DATA seq=14, humidity=76.74%[TEMP CLIENT 3001] DATA seq=25, temp=20.69°C
+[HUMID CLIENT 3002] DATA seq=15, humidity=63.27%
+[HUMID CLIENT 3002] DATA seq=16, humidity=80.93%
+[HUMID CLIENT 3002] DATA seq=17, humidity=73.40%
+[HUMID CLIENT 3002] DATA seq=18, humidity=65.93%
+[HUMID CLIENT 3002] DATA seq=19, humidity=87.16%
+
+[TEMP CLIENT 3001] DATA seq=26, temp=27.11°C
+[TEMP CLIENT 3001] DATA seq=27, temp=24.98°C
+[TEMP CLIENT 3001] DATA seq=28, temp=29.37°C
+[TEMP CLIENT 3001] DATA seq=29, temp=25.65°C
+[TEMP CLIENT 3001] DATA seq=30, temp=27.73°C
+[TEMP CLIENT 3001] DATA seq=31, temp=25.18°C
+[TEMP CLIENT 3001] DATA seq=32, temp=27.45°C
+[TEMP CLIENT 3001] DATA seq=33, temp=21.58°C
+[TEMP CLIENT 3001] DATA seq=34, temp=29.22°C[HUMID CLIENT 3002] DATA seq=20, humidity=89.17%
+[HUMID CLIENT 3002] DATA seq=21, humidity=83.20%
+[HUMID CLIENT 3002] DATA seq=22, humidity=43.75%
+[HUMID CLIENT 3002] DATA seq=23, humidity=75.34%
+[HUMID CLIENT 3002] DATA seq=24, humidity=79.66%[VOLT CLIENT 3003] DATA seq=24, voltage=4.63V
+
+[HUMID CLIENT 3002] DATA seq=25, humidity=75.84%
+[HUMID CLIENT 3002] DATA seq=26, humidity=64.68%
+[HUMID CLIENT 3002] DATA seq=27, humidity=34.24%
+[HUMID CLIENT 3002] DATA seq=28, humidity=40.20%
+[HUMID CLIENT 3002] DATA seq=29, humidity=67.76%
+[HUMID CLIENT 3002] DATA seq=30, humidity=74.71%
+[HUMID CLIENT 3002] DATA seq=31, humidity=37.08%
+[HUMID CLIENT 3002] DATA seq=32, humidity=47.87%
+[HUMID CLIENT 3002] DATA seq=33, humidity=64.60%
+[HUMID CLIENT 3002] DATA seq=34, humidity=33.55%
+[HUMID CLIENT 3002] DATA seq=35, humidity=32.05%
+[HUMID CLIENT 3002] DATA seq=36, humidity=50.28%
+[HUMID CLIENT 3002] DATA seq=37, humidity=83.52%
+[HUMID CLIENT 3002] DATA seq=38, humidity=53.96%
+[HUMID CLIENT 3002] DATA seq=39, humidity=53.79%
+[HUMID CLIENT 3002] DATA seq=40, humidity=73.39%
+[TEMP CLIENT 3001] DATA seq=35, temp=27.49°C
+[TEMP CLIENT 3001] DATA seq=36, temp=26.38°C
+[TEMP CLIENT 3001] DATA seq=37, temp=29.03°C
+[TEMP CLIENT 3001] DATA seq=38, temp=22.51°C
+[VOLT CLIENT 3003] DATA seq=25, voltage=4.45V
+[VOLT CLIENT 3003] DATA seq=26, voltage=4.86V
+[VOLT CLIENT 3003] DATA seq=27, voltage=3.58V
+[VOLT CLIENT 3003] DATA seq=28, voltage=4.37V
+[VOLT CLIENT 3003] DATA seq=29, voltage=3.40V
+
+[HUMID CLIENT 3002] DATA seq=41, humidity=46.46%[VOLT CLIENT 3003] DATA seq=30, voltage=3.03V
+
+[HUMID CLIENT 3002] DATA seq=42, humidity=85.61%
+[VOLT CLIENT 3003] DATA seq=31, voltage=5.39V
+[VOLT CLIENT 3003] DATA seq=32, voltage=4.55V
+[VOLT CLIENT 3003] DATA seq=33, voltage=3.53V
+[HUMID CLIENT 3002] DATA seq=43, humidity=80.96%
+[HUMID CLIENT 3002] DATA seq=44, humidity=38.22%
+[HUMID CLIENT 3002] DATA seq=45, humidity=61.95%
+[HUMID CLIENT 3002] DATA seq=46, humidity=83.68%
+[HUMID CLIENT 3002] DATA seq=47, humidity=33.48%
+[HUMID CLIENT 3002] DATA seq=48, humidity=43.59%
+[HUMID CLIENT 3002] DATA seq=49, humidity=49.23%
+[HUMID CLIENT 3002] DATA seq=50, humidity=38.39%
+[HUMID CLIENT 3002] DATA seq=51, humidity=89.58%
+[HUMID CLIENT 3002] DATA seq=52, humidity=43.44%
+[TEMP CLIENT 3001] DATA seq=39, temp=23.54°C
+[VOLT CLIENT 3003] DATA seq=34, voltage=4.83V
+[VOLT CLIENT 3003] DATA seq=35, voltage=3.76V
+[VOLT CLIENT 3003] DATA seq=36, voltage=3.13V
+[HUMID CLIENT 3002] DATA seq=53, humidity=73.71%[VOLT CLIENT 3003] DATA seq=37, voltage=4.97V
+[TEMP CLIENT 3001] DATA seq=40, temp=21.11°C
+[VOLT CLIENT 3003] DATA seq=38, voltage=3.93V
+[VOLT CLIENT 3003] DATA seq=39, voltage=3.86V
+
+[VOLT CLIENT 3003] DATA seq=40, voltage=4.27V
+[VOLT CLIENT 3003] DATA seq=41, voltage=4.91V
+[VOLT CLIENT 3003] DATA seq=42, voltage=4.05V
+[VOLT CLIENT 3003] DATA seq=43, voltage=3.42V
+[VOLT CLIENT 3003] DATA seq=44, voltage=5.13V
+[VOLT CLIENT 3003] DATA seq=45, voltage=4.36V
+[VOLT CLIENT 3003] DATA seq=46, voltage=4.39V[TEMP CLIENT 3001] DATA seq=41, temp=22.26°C
+
+[TEMP CLIENT 3001] DATA seq=42, temp=29.75°C
+[TEMP CLIENT 3001] DATA seq=43, temp=24.73°C
+[TEMP CLIENT 3001] DATA seq=44, temp=21.47°C
+[TEMP CLIENT 3001] DATA seq=45, temp=27.59°C
+[TEMP CLIENT 3001] DATA seq=46, temp=26.70°C
+[TEMP CLIENT 3001] DATA seq=47, temp=24.37°C
+[TEMP CLIENT 3001] DATA seq=48, temp=29.74°C
+[TEMP CLIENT 3001] DATA seq=49, temp=23.21°C
+[TEMP CLIENT 3001] DATA seq=50, temp=25.51°C
+[TEMP CLIENT 3001] DATA seq=51, temp=24.35°C[HUMID CLIENT 3002] DATA seq=54, humidity=58.70%[VOLT CLIENT 3003] DATA seq=47, voltage=4.99V
+[VOLT CLIENT 3003] DATA seq=48, voltage=3.63V
+[VOLT CLIENT 3003] DATA seq=49, voltage=4.98V
+[VOLT CLIENT 3003] DATA seq=50, voltage=3.00V
+[VOLT CLIENT 3003] DATA seq=51, voltage=5.35V
+
+[VOLT CLIENT 3003] DATA seq=52, voltage=4.10V
+[VOLT CLIENT 3003] DATA seq=53, voltage=4.85V
+[VOLT CLIENT 3003] DATA seq=54, voltage=4.53V
+[VOLT CLIENT 3003] DATA seq=55, voltage=4.73V
+[VOLT CLIENT 3003] DATA seq=56, voltage=5.03V
+[VOLT CLIENT 3003] DATA seq=57, voltage=3.47V
+[HUMID CLIENT 3002] DATA seq=55, humidity=81.85%[VOLT CLIENT 3003] DATA seq=58, voltage=3.42V
+[HUMID CLIENT 3002] DATA seq=56, humidity=85.12%
+
+[HUMID CLIENT 3002] DATA seq=57, humidity=70.48%
+[VOLT CLIENT 3003] Socket closed
+
+[TEMP CLIENT 3001] DATA seq=52, temp=23.69°C
+[TEMP CLIENT 3001] DATA seq=53, temp=21.44°C[HUMID CLIENT 3002] DATA seq=58, humidity=43.98%
+
+[HUMID CLIENT 3002] Socket closed
+[TEMP CLIENT 3001] DATA seq=54, temp=23.22°C
+[TEMP CLIENT 3001] DATA seq=55, temp=24.81°C
+[TEMP CLIENT 3001] DATA seq=56, temp=29.57°C
+[TEMP CLIENT 3001] DATA seq=57, temp=23.24°C
+[TEMP CLIENT 3001] DATA seq=58, temp=25.74°C
+[TEMP CLIENT 3001] Socket closed
+
+[LAUNCHER] All clients completed!
+Check sensor_test.csv for results!

@@ -1,0 +1,250 @@
+[SERVER] Main CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss.csv
+[SERVER] Batch details CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss_batch_details.csv
+[SERVER] Listening on port 5000
+[CONFIG] Max buffer size: 1000 packets per device
+[CONFIG] Max gap wait time: 5 seconds
+[CONFIG] Auto-shutdown after 7s of no packets
+[SERVER] Batch details logging to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss_batch_details.csv
+[1] INIT device 3001
+[2] INIT device 3003
+[3] DATA 3001 seq=1 [IN-ORDER]
+[4] DATA 3003 seq=1 [IN-ORDER]
+[BUFFERED] Device 3003: seq=3
+[BUFFERED] Device 3001: seq=4
+[BUFFERED] Device 3003: seq=4
+[BUFFERED] Device 3001: seq=6
+[BUFFERED] Device 3003: seq=6
+[BUFFERED] Device 3001: seq=7
+[BUFFERED] Device 3003: seq=7
+[BUFFERED] Device 3001: seq=8
+[BUFFERED] Device 3003: seq=8
+[BUFFERED] Device 3001: seq=9
+[BUFFERED] Device 3003: seq=9
+[BUFFERED] Device 3001: seq=10
+[BUFFERED] Device 3001: seq=11
+[BUFFERED] Device 3003: seq=11
+[BUFFERED] Device 3001: seq=12
+[BUFFERED] Device 3003: seq=12
+[BUFFERED] Device 3001: seq=13
+[TIMEOUT] Filling gap after seq=1
+   >>> Estimating 1 packets (Seq 2 to 2) [NORMAL MODE]
+[REORDER] releasing seq=3
+[REORDER] releasing seq=4
+[BUFFERED] Device 3003: seq=13
+[TIMEOUT] Filling gap after seq=1
+   >>> Estimating 2 packets (Seq 2 to 3) [NORMAL MODE]
+[REORDER] releasing seq=4
+[BUFFERED] Device 3001: seq=14
+[BUFFERED] Device 3003: seq=14
+[BUFFERED] Device 3003: seq=15
+[BUFFERED] Device 3001: seq=16
+[BUFFERED] Device 3003: seq=16
+[BUFFERED] Device 3001: seq=17
+[BUFFERED] Device 3001: seq=18
+[BUFFERED] Device 3001: seq=19
+[BUFFERED] Device 3003: seq=19
+[BUFFERED] Device 3003: seq=20
+[BUFFERED] Device 3001: seq=20
+[BUFFERED] Device 3003: seq=21
+[BUFFERED] Device 3001: seq=21
+[BUFFERED] Device 3001: seq=22
+[BUFFERED] Device 3003: seq=22
+[TIMEOUT] Filling gap after seq=4
+   >>> Estimating 1 packets (Seq 5 to 5) [NORMAL MODE]
+[REORDER] releasing seq=6
+[REORDER] releasing seq=7
+[REORDER] releasing seq=8
+[REORDER] releasing seq=9
+[BUFFERED] Device 3003: seq=23
+[BUFFERED] Device 3001: seq=23
+[BUFFERED] Device 3003: seq=24
+[TIMEOUT] Filling gap after seq=4
+   >>> Estimating 1 packets (Seq 5 to 5) [NORMAL MODE]
+[REORDER] releasing seq=6
+[REORDER] releasing seq=7
+[REORDER] releasing seq=8
+[REORDER] releasing seq=9
+[REORDER] releasing seq=10
+[REORDER] releasing seq=11
+[REORDER] releasing seq=12
+[REORDER] releasing seq=13
+[REORDER] releasing seq=14
+[BUFFERED] Device 3001: seq=24
+[BUFFERED] Device 3003: seq=25
+[BUFFERED] Device 3001: seq=25
+[BUFFERED] Device 3001: seq=26
+[BUFFERED] Device 3003: seq=26
+[BUFFERED] Device 3003: seq=27
+[BUFFERED] Device 3001: seq=28
+[BUFFERED] Device 3003: seq=28
+[BUFFERED] Device 3001: seq=29
+[BUFFERED] Device 3003: seq=29
+[METRICS] Packets: 50, Avg size: 18.8B, Duplicates: 0.00%, Gaps: 5, CPU: 330.900ms/pkt
+[BUFFERED] Device 3001: seq=30
+[BUFFERED] Device 3001: seq=31
+[BUFFERED] Device 3001: seq=32
+[BUFFERED] Device 3003: seq=32
+[TIMEOUT] Filling gap after seq=9
+   >>> Estimating 1 packets (Seq 10 to 10) [NORMAL MODE]
+[REORDER] releasing seq=11
+[REORDER] releasing seq=12
+[REORDER] releasing seq=13
+[REORDER] releasing seq=14
+[REORDER] releasing seq=15
+[REORDER] releasing seq=16
+[BUFFERED] Device 3003: seq=33
+[TIMEOUT] Filling gap after seq=14
+   >>> Estimating 1 packets (Seq 15 to 15) [NORMAL MODE]
+[REORDER] releasing seq=16
+[REORDER] releasing seq=17
+[REORDER] releasing seq=18
+[REORDER] releasing seq=19
+[REORDER] releasing seq=20
+[REORDER] releasing seq=21
+[REORDER] releasing seq=22
+[REORDER] releasing seq=23
+[REORDER] releasing seq=24
+[REORDER] releasing seq=25
+[REORDER] releasing seq=26
+[BUFFERED] Device 3001: seq=34
+[BUFFERED] Device 3003: seq=34
+[BUFFERED] Device 3003: seq=35
+[BUFFERED] Device 3001: seq=35
+[BUFFERED] Device 3003: seq=36
+[BUFFERED] Device 3001: seq=36
+[BUFFERED] Device 3001: seq=37
+[BUFFERED] Device 3003: seq=37
+[BUFFERED] Device 3003: seq=38
+[BUFFERED] Device 3003: seq=39
+[BUFFERED] Device 3001: seq=39
+[BUFFERED] Device 3001: seq=40
+[BUFFERED] Device 3003: seq=41
+[BUFFERED] Device 3001: seq=41
+[BUFFERED] Device 3003: seq=42
+[BUFFERED] Device 3001: seq=42
+[BUFFERED] Device 3001: seq=43
+[TIMEOUT] Filling gap after seq=16
+   >>> Estimating 2 packets (Seq 17 to 18) [NORMAL MODE]
+[REORDER] releasing seq=19
+[REORDER] releasing seq=20
+[REORDER] releasing seq=21
+[REORDER] releasing seq=22
+[REORDER] releasing seq=23
+[REORDER] releasing seq=24
+[REORDER] releasing seq=25
+[REORDER] releasing seq=26
+[REORDER] releasing seq=27
+[REORDER] releasing seq=28
+[REORDER] releasing seq=29
+[BUFFERED] Device 3003: seq=43
+[TIMEOUT] Filling gap after seq=26
+   >>> Estimating 1 packets (Seq 27 to 27) [NORMAL MODE]
+[REORDER] releasing seq=28
+[REORDER] releasing seq=29
+[REORDER] releasing seq=30
+[REORDER] releasing seq=31
+[REORDER] releasing seq=32
+[BUFFERED] Device 3001: seq=44
+[BUFFERED] Device 3003: seq=44
+[BUFFERED] Device 3001: seq=45
+[BUFFERED] Device 3001: seq=46
+[BUFFERED] Device 3003: seq=46
+[BUFFERED] Device 3001: seq=47
+[BUFFERED] Device 3003: seq=47
+[BUFFERED] Device 3001: seq=48
+[BUFFERED] Device 3003: seq=48
+[BUFFERED] Device 3001: seq=49
+[BUFFERED] Device 3003: seq=49
+[BUFFERED] Device 3003: seq=50
+[BUFFERED] Device 3001: seq=51
+[TIMEOUT] Filling gap after seq=29
+   >>> Estimating 2 packets (Seq 30 to 31) [NORMAL MODE]
+[REORDER] releasing seq=32
+[REORDER] releasing seq=33
+[REORDER] releasing seq=34
+[REORDER] releasing seq=35
+[REORDER] releasing seq=36
+[REORDER] releasing seq=37
+[REORDER] releasing seq=38
+[REORDER] releasing seq=39
+[BUFFERED] Device 3003: seq=51
+[BUFFERED] Device 3003: seq=52
+[BUFFERED] Device 3001: seq=53
+[BUFFERED] Device 3003: seq=53
+[BUFFERED] Device 3003: seq=54
+[BUFFERED] Device 3003: seq=55
+[BUFFERED] Device 3003: seq=56
+[TIMEOUT] Filling gap after seq=32
+   >>> Estimating 1 packets (Seq 33 to 33) [NORMAL MODE]
+[REORDER] releasing seq=34
+[REORDER] releasing seq=35
+[REORDER] releasing seq=36
+[REORDER] releasing seq=37
+[BUFFERED] Device 3001: seq=56
+[BUFFERED] Device 3003: seq=57
+[CLEANUP] Force filling gap for device 3001
+   >>> Estimating 1 packets (Seq 38 to 38) [NORMAL MODE]
+[REORDER] releasing seq=39
+[REORDER] releasing seq=40
+[REORDER] releasing seq=41
+[REORDER] releasing seq=42
+[REORDER] releasing seq=43
+[REORDER] releasing seq=44
+[REORDER] releasing seq=45
+[REORDER] releasing seq=46
+[REORDER] releasing seq=47
+[REORDER] releasing seq=48
+[REORDER] releasing seq=49
+[CLEANUP] Force filling gap for device 3003
+   >>> Estimating 1 packets (Seq 40 to 40) [NORMAL MODE]
+[REORDER] releasing seq=41
+[REORDER] releasing seq=42
+[REORDER] releasing seq=43
+[REORDER] releasing seq=44
+[CLEANUP] Force filling gap for device 3003
+   >>> Estimating 1 packets (Seq 45 to 45) [NORMAL MODE]
+[REORDER] releasing seq=46
+[REORDER] releasing seq=47
+[REORDER] releasing seq=48
+[REORDER] releasing seq=49
+[REORDER] releasing seq=50
+[REORDER] releasing seq=51
+[REORDER] releasing seq=52
+[REORDER] releasing seq=53
+[REORDER] releasing seq=54
+[REORDER] releasing seq=55
+[REORDER] releasing seq=56
+[REORDER] releasing seq=57
+
+[SERVER] Auto-shutdown: No packets for 7s
+
+[SERVER] Finalizing metrics...
+[SERVER] Batch details saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss_batch_details.csv
+
+======================================================================
+PHASE 2 METRICS REPORT
+======================================================================
+bytes_per_report:     18.87 bytes
+packets_received:     95
+duplicate_rate:       0.000%
+sequence_gap_count:   13
+cpu_ms_per_report:    406.898 ms (estimated)
+
+Additional Performance Metrics:
+Duration:             38.7 seconds
+Packets per second:   2.5
+Bytes per second:     46.4
+Total bytes received: 1793
+
+Per-Device Statistics:
+  Device 3001: 46 packets, 0 duplicates (0.0%), 6 gaps, 868 bytes
+  Device 3003: 49 packets, 0 duplicates (0.0%), 7 gaps, 925 bytes
+
+Phase 2 Compliance:
+  Duplicate rate <= 1%: PASS
+  Packets received > 0: PASS
+  No critical gaps: FAIL
+
+Overall Status: NON-COMPLIANT
+======================================================================
+[SERVER] Metrics saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_loss.csv

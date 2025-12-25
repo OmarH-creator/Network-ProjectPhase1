@@ -1,0 +1,54 @@
+Timestamp,Precise_Time,Device_ID,Seq_Num,Msg_Type,Temp_C,Humid_Pct,Volt_V
+2025-12-12 16:44:48.101226,1765550688.101226,3002,0,INIT,<null>,<null>,<null>
+2025-12-12 16:44:50.208865,1765550690.208865,3002,1,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:50.810593,1765550690.810593,3002,2,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:51.412617,1765550691.412617,3002,3,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:52.014509,1765550692.014509,3002,4,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:52.616705,1765550692.616705,3002,5,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:53.119158,1765550693.119158,3002,6,DATA,<null>,67.75,<null>
+2025-12-12 16:44:55.149107,1765550695.149107,3002,7,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:55.751547,1765550695.751547,3002,8,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:56.353744,1765550696.353744,3002,9,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:56.956039,1765550696.956039,3002,10,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:57.557755,1765550697.557755,3002,11,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:44:58.160534,1765550698.160534,3002,12,DATA,<null>,56.43,<null>
+2025-12-12 16:45:00.168610,1765550700.168610,3002,13,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:00.771505,1765550700.771505,3002,14,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:01.373398,1765550701.373398,3002,15,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:01.975702,1765550701.975702,3002,16,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:02.577452,1765550702.577452,3002,17,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:03.179740,1765550703.179740,3002,18,DATA,<null>,61.47,<null>
+2025-12-12 16:45:05.188030,1765550705.188030,3002,19,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:05.790014,1765550705.790014,3002,20,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:06.392936,1765550706.392936,3002,21,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:06.995488,1765550706.995488,3002,22,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:07.598295,1765550707.598295,3002,23,HEARTBEAT,<null>,<null>,<null>
+2025-12-12 16:45:08.200905,1765550708.200905,3002,24,DATA,<null>,58.68,<null>
+,,,,,,,
+=== PHASE 2 METRICS REPORT ===,,,,,,,
+,,,,,,,
+METRIC,VALUE,UNIT,,,,,
+bytes_per_report,32.96,bytes,,,,,
+packets_received,25,count,,,,,
+duplicate_rate,0.000,percent,,,,,
+sequence_gap_count,0,count,,,,,
+cpu_ms_per_report,2327.960,milliseconds (estimated),,,,,
+,,,,,,,
+=== ADDITIONAL METRICS ===,,,,,,,
+duration_seconds,58.2,seconds,,,,,
+packets_per_second,0.4,packets/sec,,,,,
+bytes_per_second,14.2,bytes/sec,,,,,
+total_bytes_received,824,bytes,,,,,
+,,,,,,,
+=== PER-DEVICE STATISTICS ===,,,,,,,
+Device_ID,Packets,Duplicates,Dup_Rate_%,Gaps,Bytes,,
+3002,0,0,0.0,0,0,,
+,,,,,,,
+=== PHASE 2 COMPLIANCE ===,,,,,,,
+Check,Status,Threshold,,,,,
+Duplicate rate <= 1%,PASS,<= 1%,,,,,
+Packets received > 0,PASS,> 0,,,,,
+No critical gaps,PASS,< 5% of packets,,,,,
+,,,,,,,
+OVERALL STATUS,COMPLIANT,,,,,,
+Report generated,2025-12-12 16:45:18,,,,,,

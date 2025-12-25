@@ -1,0 +1,252 @@
+[SERVER] Main CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate.csv
+[SERVER] Batch details CSV: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate_batch_details.csv
+[SERVER] Listening on port 5000
+[CONFIG] Max buffer size: 1000 packets per device
+[CONFIG] Max gap wait time: 5 seconds
+[CONFIG] Auto-shutdown after 7s of no packets
+[SERVER] Batch details logging to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate_batch_details.csv
+[1] INIT device 3001
+[2] INIT device 3002
+[3] INIT device 3003
+[4] INIT device 3003
+[5] DATA 3001 seq=1 [IN-ORDER]
+[6] DATA 3002 seq=1 [IN-ORDER]
+[7] DATA 3003 seq=1 [IN-ORDER]
+[8] DATA 3001 seq=2 [IN-ORDER]
+[9] DATA 3002 seq=2 [IN-ORDER]
+[10] DATA 3003 seq=2 [IN-ORDER]
+[11] DATA 3001 seq=3 [IN-ORDER]
+[12] DATA 3002 seq=3 [IN-ORDER]
+[13] DATA 3003 seq=3 [IN-ORDER]
+[14] DATA 3001 seq=4 [IN-ORDER]
+[15] DATA 3002 seq=4 [IN-ORDER]
+[16] DATA 3003 seq=4 [IN-ORDER]
+[17] DATA 3001 seq=5 [IN-ORDER]
+[18] DATA 3002 seq=5 [IN-ORDER]
+[19] DATA 3003 seq=5 [IN-ORDER]
+[20] DATA 3001 seq=6 [IN-ORDER]
+[21] DATA 3002 seq=6 [IN-ORDER]
+[22] DATA 3002 seq=6 [DUPLICATE]
+[23] DATA 3003 seq=6 [IN-ORDER]
+[24] DATA 3001 seq=7 [IN-ORDER]
+[25] DATA 3002 seq=7 [IN-ORDER]
+[26] DATA 3003 seq=7 [IN-ORDER]
+[27] DATA 3001 seq=8 [IN-ORDER]
+[28] DATA 3002 seq=8 [IN-ORDER]
+[29] DATA 3003 seq=8 [IN-ORDER]
+[30] DATA 3001 seq=9 [IN-ORDER]
+[31] DATA 3002 seq=9 [IN-ORDER]
+[32] DATA 3003 seq=9 [IN-ORDER]
+[33] DATA 3003 seq=9 [DUPLICATE]
+[34] DATA 3001 seq=10 [IN-ORDER]
+[35] DATA 3001 seq=10 [DUPLICATE]
+[36] DATA 3003 seq=10 [IN-ORDER]
+[37] DATA 3002 seq=10 [IN-ORDER]
+[38] DATA 3003 seq=11 [IN-ORDER]
+[39] DATA 3001 seq=11 [IN-ORDER]
+[40] DATA 3002 seq=11 [IN-ORDER]
+[41] DATA 3003 seq=12 [IN-ORDER]
+[42] DATA 3001 seq=12 [IN-ORDER]
+[43] DATA 3001 seq=12 [DUPLICATE]
+[44] DATA 3002 seq=12 [IN-ORDER]
+[45] DATA 3003 seq=13 [IN-ORDER]
+[46] DATA 3001 seq=13 [IN-ORDER]
+[47] DATA 3001 seq=13 [DUPLICATE]
+[48] DATA 3002 seq=13 [IN-ORDER]
+[49] DATA 3003 seq=14 [IN-ORDER]
+[50] DATA 3001 seq=14 [IN-ORDER]
+[METRICS] Packets: 50, Avg size: 18.5B, Duplicates: 10.00%, Gaps: 0, CPU: 180.815ms/pkt
+[51] DATA 3002 seq=14 [IN-ORDER]
+[52] DATA 3001 seq=15 [IN-ORDER]
+[53] DATA 3003 seq=15 [IN-ORDER]
+[54] DATA 3002 seq=15 [IN-ORDER]
+[55] DATA 3002 seq=15 [DUPLICATE]
+[56] DATA 3003 seq=16 [IN-ORDER]
+[57] DATA 3001 seq=16 [IN-ORDER]
+[58] DATA 3002 seq=16 [IN-ORDER]
+[59] DATA 3002 seq=16 [DUPLICATE]
+[60] DATA 3003 seq=17 [IN-ORDER]
+[61] DATA 3001 seq=17 [IN-ORDER]
+[62] DATA 3002 seq=17 [IN-ORDER]
+[63] DATA 3002 seq=17 [DUPLICATE]
+[64] DATA 3001 seq=18 [IN-ORDER]
+[65] DATA 3003 seq=18 [IN-ORDER]
+[66] DATA 3002 seq=18 [IN-ORDER]
+[67] DATA 3003 seq=19 [IN-ORDER]
+[68] DATA 3001 seq=19 [IN-ORDER]
+[69] DATA 3002 seq=19 [IN-ORDER]
+[70] DATA 3003 seq=20 [IN-ORDER]
+[71] DATA 3001 seq=20 [IN-ORDER]
+[72] DATA 3002 seq=20 [IN-ORDER]
+[73] DATA 3003 seq=21 [IN-ORDER]
+[74] DATA 3001 seq=21 [IN-ORDER]
+[75] DATA 3001 seq=21 [DUPLICATE]
+[76] DATA 3002 seq=21 [IN-ORDER]
+[77] DATA 3002 seq=22 [IN-ORDER]
+[78] DATA 3003 seq=22 [IN-ORDER]
+[79] DATA 3001 seq=22 [IN-ORDER]
+[80] DATA 3002 seq=23 [IN-ORDER]
+[81] DATA 3002 seq=23 [DUPLICATE]
+[82] DATA 3001 seq=23 [IN-ORDER]
+[83] DATA 3003 seq=23 [IN-ORDER]
+[84] DATA 3002 seq=24 [IN-ORDER]
+[85] DATA 3001 seq=24 [IN-ORDER]
+[86] DATA 3003 seq=24 [IN-ORDER]
+[87] DATA 3002 seq=25 [IN-ORDER]
+[88] DATA 3001 seq=25 [IN-ORDER]
+[89] DATA 3001 seq=25 [DUPLICATE]
+[90] DATA 3003 seq=25 [IN-ORDER]
+[91] DATA 3002 seq=26 [IN-ORDER]
+[92] DATA 3003 seq=26 [IN-ORDER]
+[93] DATA 3003 seq=26 [DUPLICATE]
+[94] DATA 3001 seq=26 [IN-ORDER]
+[95] DATA 3002 seq=27 [IN-ORDER]
+[96] DATA 3001 seq=27 [IN-ORDER]
+[97] DATA 3003 seq=27 [IN-ORDER]
+[98] DATA 3002 seq=28 [IN-ORDER]
+[99] DATA 3001 seq=28 [IN-ORDER]
+[100] DATA 3003 seq=28 [IN-ORDER]
+[METRICS] Packets: 100, Avg size: 18.8B, Duplicates: 12.00%, Gaps: 0, CPU: 160.552ms/pkt
+[101] DATA 3001 seq=29 [IN-ORDER]
+[102] DATA 3002 seq=29 [IN-ORDER]
+[103] DATA 3003 seq=29 [IN-ORDER]
+[104] DATA 3002 seq=30 [IN-ORDER]
+[105] DATA 3001 seq=30 [IN-ORDER]
+[106] DATA 3003 seq=30 [IN-ORDER]
+[107] DATA 3002 seq=31 [IN-ORDER]
+[108] DATA 3003 seq=31 [IN-ORDER]
+[109] DATA 3001 seq=31 [IN-ORDER]
+[110] DATA 3002 seq=32 [IN-ORDER]
+[111] DATA 3003 seq=32 [IN-ORDER]
+[112] DATA 3001 seq=32 [IN-ORDER]
+[113] DATA 3002 seq=33 [IN-ORDER]
+[114] DATA 3003 seq=33 [IN-ORDER]
+[115] DATA 3001 seq=33 [IN-ORDER]
+[116] DATA 3001 seq=33 [DUPLICATE]
+[117] DATA 3002 seq=34 [IN-ORDER]
+[118] DATA 3003 seq=34 [IN-ORDER]
+[119] DATA 3001 seq=34 [IN-ORDER]
+[120] DATA 3003 seq=35 [IN-ORDER]
+[121] DATA 3003 seq=35 [DUPLICATE]
+[122] DATA 3002 seq=35 [IN-ORDER]
+[123] DATA 3001 seq=35 [IN-ORDER]
+[124] DATA 3003 seq=36 [IN-ORDER]
+[125] DATA 3002 seq=36 [IN-ORDER]
+[126] DATA 3001 seq=36 [IN-ORDER]
+[127] DATA 3003 seq=37 [IN-ORDER]
+[128] DATA 3002 seq=37 [IN-ORDER]
+[129] DATA 3001 seq=37 [IN-ORDER]
+[130] DATA 3003 seq=38 [IN-ORDER]
+[131] DATA 3003 seq=38 [DUPLICATE]
+[132] DATA 3001 seq=38 [IN-ORDER]
+[133] DATA 3002 seq=38 [IN-ORDER]
+[134] DATA 3003 seq=39 [IN-ORDER]
+[135] DATA 3001 seq=39 [IN-ORDER]
+[136] DATA 3002 seq=39 [IN-ORDER]
+[137] DATA 3002 seq=39 [DUPLICATE]
+[138] DATA 3003 seq=40 [IN-ORDER]
+[139] DATA 3001 seq=40 [IN-ORDER]
+[140] DATA 3001 seq=40 [DUPLICATE]
+[141] DATA 3002 seq=40 [IN-ORDER]
+[142] DATA 3003 seq=41 [IN-ORDER]
+[143] DATA 3002 seq=41 [IN-ORDER]
+[144] DATA 3001 seq=41 [IN-ORDER]
+[145] DATA 3001 seq=42 [IN-ORDER]
+[146] DATA 3003 seq=42 [IN-ORDER]
+[147] DATA 3002 seq=42 [IN-ORDER]
+[148] DATA 3002 seq=43 [IN-ORDER]
+[149] DATA 3001 seq=43 [IN-ORDER]
+[150] DATA 3003 seq=43 [IN-ORDER]
+[METRICS] Packets: 150, Avg size: 18.8B, Duplicates: 11.33%, Gaps: 0, CPU: 157.115ms/pkt
+[151] DATA 3003 seq=43 [DUPLICATE]
+[152] DATA 3002 seq=44 [IN-ORDER]
+[153] DATA 3001 seq=44 [IN-ORDER]
+[154] DATA 3003 seq=44 [IN-ORDER]
+[155] DATA 3002 seq=45 [IN-ORDER]
+[156] DATA 3001 seq=45 [IN-ORDER]
+[157] DATA 3003 seq=45 [IN-ORDER]
+[158] DATA 3002 seq=46 [IN-ORDER]
+[159] DATA 3003 seq=46 [IN-ORDER]
+[160] DATA 3001 seq=46 [IN-ORDER]
+[161] DATA 3003 seq=47 [IN-ORDER]
+[162] DATA 3002 seq=47 [IN-ORDER]
+[163] DATA 3001 seq=47 [IN-ORDER]
+[164] DATA 3003 seq=48 [IN-ORDER]
+[165] DATA 3003 seq=48 [DUPLICATE]
+[166] DATA 3002 seq=48 [IN-ORDER]
+[167] DATA 3001 seq=48 [IN-ORDER]
+[168] DATA 3001 seq=48 [DUPLICATE]
+[169] DATA 3003 seq=49 [IN-ORDER]
+[170] DATA 3003 seq=49 [DUPLICATE]
+[171] DATA 3002 seq=49 [IN-ORDER]
+[172] DATA 3001 seq=49 [IN-ORDER]
+[173] DATA 3002 seq=50 [IN-ORDER]
+[174] DATA 3001 seq=50 [IN-ORDER]
+[175] DATA 3002 seq=50 [DUPLICATE]
+[176] DATA 3003 seq=50 [IN-ORDER]
+[177] DATA 3003 seq=50 [DUPLICATE]
+[178] DATA 3002 seq=51 [IN-ORDER]
+[179] DATA 3001 seq=51 [IN-ORDER]
+[180] DATA 3003 seq=51 [IN-ORDER]
+[181] DATA 3003 seq=51 [DUPLICATE]
+[182] DATA 3002 seq=52 [IN-ORDER]
+[183] DATA 3001 seq=52 [IN-ORDER]
+[184] DATA 3003 seq=52 [IN-ORDER]
+[185] DATA 3002 seq=53 [IN-ORDER]
+[186] DATA 3001 seq=53 [IN-ORDER]
+[187] DATA 3003 seq=53 [IN-ORDER]
+[188] DATA 3002 seq=54 [IN-ORDER]
+[189] DATA 3002 seq=54 [DUPLICATE]
+[190] DATA 3001 seq=54 [IN-ORDER]
+[191] DATA 3003 seq=54 [IN-ORDER]
+[192] DATA 3002 seq=55 [IN-ORDER]
+[193] DATA 3001 seq=55 [IN-ORDER]
+[194] DATA 3003 seq=55 [IN-ORDER]
+[195] DATA 3003 seq=55 [DUPLICATE]
+[196] DATA 3002 seq=56 [IN-ORDER]
+[197] DATA 3002 seq=56 [DUPLICATE]
+[198] DATA 3003 seq=56 [IN-ORDER]
+[199] DATA 3003 seq=56 [DUPLICATE]
+[200] DATA 3001 seq=56 [IN-ORDER]
+[METRICS] Packets: 200, Avg size: 18.9B, Duplicates: 14.00%, Gaps: 0, CPU: 155.082ms/pkt
+[201] DATA 3001 seq=57 [IN-ORDER]
+[202] DATA 3003 seq=57 [IN-ORDER]
+[203] DATA 3003 seq=57 [DUPLICATE]
+[204] DATA 3002 seq=57 [IN-ORDER]
+[205] DATA 3002 seq=58 [IN-ORDER]
+[206] DATA 3001 seq=58 [IN-ORDER]
+[207] DATA 3003 seq=58 [IN-ORDER]
+
+[SERVER] Auto-shutdown: No packets for 7s
+
+[SERVER] Finalizing metrics...
+[SERVER] Batch details saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate_batch_details.csv
+
+======================================================================
+PHASE 2 METRICS REPORT
+======================================================================
+bytes_per_report:     18.88 bytes
+packets_received:     207
+duplicate_rate:       14.010%
+sequence_gap_count:   0
+cpu_ms_per_report:    188.561 ms (estimated)
+
+Additional Performance Metrics:
+Duration:             39.0 seconds
+Packets per second:   5.3
+Bytes per second:     100.1
+Total bytes received: 3909
+
+Per-Device Statistics:
+  Device 3001: 67 packets, 8 duplicates (11.9%), 0 gaps, 1267 bytes
+  Device 3002: 68 packets, 9 duplicates (13.2%), 0 gaps, 1286 bytes
+  Device 3003: 72 packets, 12 duplicates (16.7%), 0 gaps, 1356 bytes
+
+Phase 2 Compliance:
+  Duplicate rate <= 1%: FAIL
+  Packets received > 0: PASS
+  No critical gaps: PASS
+
+Overall Status: NON-COMPLIANT
+======================================================================
+[SERVER] Metrics saved to: /mnt/c/Users/Lenovo/Desktop/Senior-1/Fall 2025/CSE351 Computer Networks/Project/Team29_Phase1/Team29_Phase1_Code/test_results/telemetry_duplicate.csv

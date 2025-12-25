@@ -5,11 +5,13 @@ import argparse
 import time
 from datetime import datetime, timedelta
 from collections import deque, OrderedDict, defaultdict
-from protocol_M_M import decode_packet, MSG_INIT, MSG_DATA, MSG_HEARTBEAT, SENSOR_TEMP, SENSOR_HUM, SENSOR_VOLT,FLAG_BATCHING
+from protocol_M_M import decode_packet, MSG_INIT, MSG_DATA, MSG_HEARTBEAT, SENSOR_TEMP, SENSOR_HUM, SENSOR_VOLT, \
+    FLAG_BATCHING
 
 # Try to import psutil for CPU monitoring, fallback if not available
 try:
     import psutil
+
     PSUTIL_AVAILABLE = True
 except ImportError:
     PSUTIL_AVAILABLE = False
@@ -26,7 +28,7 @@ class Server:
         # Configuration
         self.max_buffer_size = max_buffer_size
         self.max_gap_wait_seconds = max_gap_wait_seconds
-        
+
         # Auto-shutdown feature
         self.auto_shutdown_timeout = auto_shutdown_timeout
         self.last_packet_time = None
@@ -93,7 +95,9 @@ class Server:
             self.telemetry_file = f
             writer = csv.writer(f)
 
-            writer.writerow(['Timestamp', 'Precise_Time', 'Device_ID', 'Seq_Num', 'Msg_Type','Is_Duplicate', 'Is_Gap', 'Temp_C', 'Humid_Pct', 'Volt_V'])
+            writer.writerow(
+                ['Timestamp', 'Precise_Time', 'Device_ID', 'Seq_Num', 'Msg_Type', 'Is_Duplicate', 'Is_Gap', 'Temp_C',
+                 'Humid_Pct', 'Volt_V'])
             self.telemetry_file.flush()
 
             try:
@@ -105,30 +109,29 @@ class Server:
                         arrival_time = time.time()  # Capture precise arrival time immediately
                         self.packet_count += 1
                         self.last_packet_time = arrival_time  # Update last packet time
-                        
+
                         # Update metrics
 
                         packet_size = len(data)
                         self.total_bytes_received += packet_size
                         self.packets_received += 1
-                        
+
                         try:
                             packet = decode_packet(data)
                             timestamp = datetime.now()
-                            
+
                             # Update device state metrics (device_state created automatically by defaultdict)
-                            
-                            self._process_telemetry(packet, timestamp, arrival_time, writer,packet_size)
-                            
+
+                            self._process_telemetry(packet, timestamp, arrival_time, writer, packet_size)
+
                             # Measure CPU time for this packet (basic timing)
                             cpu_end = time.perf_counter()
                             cpu_time_ms = (cpu_end - cpu_start) * 1000
                             self.cpu_times.append(cpu_time_ms)
 
-
                             if self.packet_count % 100 == 0:
                                 self._cleanup_old_buffers(timestamp, writer)
-                            
+
                             # Print periodic metrics (every 50 packets)
                             if self.packet_count % 50 == 0:
                                 current_metrics = self.calculate_metrics()
@@ -157,7 +160,7 @@ class Server:
         self.finalize_and_save_metrics()
         self.sock.close()
 
-    def _process_telemetry(self, packet, timestamp, arrival_time, writer,packet_size):
+    def _process_telemetry(self, packet, timestamp, arrival_time, writer, packet_size):
         timestamp_str = datetime.fromtimestamp(arrival_time).strftime('%Y-%m-%d %H:%M:%S.%f')
         precise_time = f"{arrival_time:.6f}"  # Unix timestamp with 6 decimal places
 
@@ -175,7 +178,6 @@ class Server:
         current_seq = packet.seq_num
         last_seq = device_state['last_seq']
 
-
         # --- INIT Message ---
         if packet.msg_type != MSG_DATA:
             if packet.msg_type == MSG_INIT:
@@ -184,7 +186,9 @@ class Server:
                 device_state['last_values'] = None  # Reset values
                 device_state['gap_start_time'] = None
 
-                writer.writerow([timestamp_str, precise_time, packet.device_id, packet.seq_num, 'INIT',0, 0, '<null>', '<null>', '<null>'])
+                writer.writerow(
+                    [timestamp_str, precise_time, packet.device_id, packet.seq_num, 'INIT', 0, 0, '<null>', '<null>',
+                     '<null>'])
                 self.telemetry_file.flush()
 
                 self._process_buffered_packets(packet.device_id, timestamp, writer)
@@ -207,7 +211,7 @@ class Server:
 
                     writer.writerow([
                         timestamp_str, precise_time, packet.device_id,
-                        packet.seq_num, 'HEARTBEAT',is_duplicate, is_gap,
+                        packet.seq_num, 'HEARTBEAT', is_duplicate, is_gap,
                         '<null>', '<null>', '<null>'
                     ])
                     self.telemetry_file.flush()
@@ -226,11 +230,11 @@ class Server:
 
                         device_state['gaps'] += 1
                         device_state['total_gap_packets'] += gap_size  # FIXED
-                        self.sequence_gaps+=gap_size
+                        self.sequence_gaps += gap_size
 
                         writer.writerow([
                             timestamp_str, precise_time, packet.device_id,
-                            packet.seq_num, 'HEARTBEAT',is_duplicate, is_gap,
+                            packet.seq_num, 'HEARTBEAT', is_duplicate, is_gap,
                             '<null>', '<null>', '<null>'
                         ])
                         # DO NOT interpolate HB packet
@@ -243,7 +247,7 @@ class Server:
 
                 writer.writerow([
                     timestamp_str, precise_time, packet.device_id,
-                    packet.seq_num, 'HEARTBEAT',is_duplicate, is_gap,
+                    packet.seq_num, 'HEARTBEAT', is_duplicate, is_gap,
                     '<null>', '<null>', '<null>',
 
                 ])
@@ -259,13 +263,13 @@ class Server:
                 print(f"[{self.packet_count}] DATA {packet.device_id} seq={current_seq} [DUPLICATE]")
                 device_state['duplicates'] += 1
                 self.duplicate_count += 1
-                self._log_data_packet(packet, timestamp_str, precise_time, writer, 1, 0,packet.device_id)
+                self._log_data_packet(packet, timestamp_str, precise_time, writer, 1, 0, packet.device_id)
                 return
 
             # 2. In-Order Check
             if current_seq == last_seq + 1:
                 print(f"[{self.packet_count}] DATA {packet.device_id} seq={current_seq} [IN-ORDER]")
-                self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0,packet.device_id)
+                self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0, packet.device_id)
 
                 # Update last_values for interpolation
                 device_state['last_values'] = self._get_packet_values(packet)
@@ -300,13 +304,14 @@ class Server:
                     batch_size = len(next_packet.readings)
                     # Interpolate from last_seq to next_avail_seq
                     start_vals = device_state['last_values']
-                    end_vals = self._get_first_packet_values(next_packet)  # This now holds FIRST values of next packet (Fixed)
+                    end_vals = self._get_first_packet_values(
+                        next_packet)  # This now holds FIRST values of next packet (Fixed)
                     gap_size = next_avail_seq - last_seq - 1
                     device_state['gaps'] += gap_size
                     self.sequence_gaps += gap_size
 
                     self._interpolate_and_log(packet.device_id, last_seq, next_avail_seq,
-                                              start_vals, end_vals, timestamp_str, writer,0,1,batch_size=batch_size)
+                                              start_vals, end_vals, timestamp_str, writer, 0, 1, batch_size=batch_size)
 
                     # Advance state to just before the next available packet
                     device_state['last_seq'] = next_avail_seq - 1
@@ -315,7 +320,7 @@ class Server:
                     # Now process the buffered packets (or current) naturally
                     if current_seq == device_state['last_seq'] + 1:
                         # Current packet is now next
-                        self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0,packet.device_id)
+                        self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0, packet.device_id)
                         device_state['last_values'] = self._get_packet_values(packet)
                         device_state['last_seq'] = current_seq
                     else:
@@ -357,7 +362,7 @@ class Server:
             self.batch_details_writer = csv.writer(self.batch_details_file_handle)
             # Write header for batch details
             self.batch_details_writer.writerow([
-                'Batch_Timestamp', 'Device_ID', 'Seq_Num','Is_Duplicate', 'Is_Gap', 'Batch_Size', 'Reading_Index',
+                'Batch_Timestamp', 'Device_ID', 'Seq_Num', 'Is_Duplicate', 'Is_Gap', 'Batch_Size', 'Reading_Index',
                 'Sensor_Type', 'Value', 'Unit', 'Batch_Avg', 'Batch_Min', 'Batch_Max'
             ])
             print(f"[SERVER] Batch details logging to: {self.batch_details_file}")
@@ -427,6 +432,7 @@ class Server:
         # Flush to ensure data is written
         if self.batch_details_file_handle:
             self.batch_details_file_handle.flush()
+
     def _process_buffered_packets(self, device_id, timestamp, writer):
         device_state = self.device_states[device_id]
         buffer = device_state['buffer']
@@ -437,7 +443,7 @@ class Server:
             if next_seq == last_seq + 1:
                 item = buffer.pop(next_seq)
                 print(f"[REORDER] releasing seq={next_seq}")
-                self._log_data_packet(item['packet'], item['timestamp'], item['precise_time'], writer, 0, 0,device_id)
+                self._log_data_packet(item['packet'], item['timestamp'], item['precise_time'], writer, 0, 0, device_id)
 
                 # Update state
                 device_state['last_values'] = self._get_packet_values(item['packet'])
@@ -469,9 +475,11 @@ class Server:
                 batch_size = len(first_buff_packet.readings)
 
                 start_vals = state['last_values']
-                end_vals = self._get_first_packet_values(first_buff_packet)  # This now holds FIRST values of next packet (Fixed)
+                end_vals = self._get_first_packet_values(
+                    first_buff_packet)  # This now holds FIRST values of next packet (Fixed)
                 self._interpolate_and_log(device_id, state['last_seq'], first_buff_seq,
-                                          start_vals, end_vals, oldest['timestamp'], writer,0,1,batch_size=batch_size)
+                                          start_vals, end_vals, oldest['timestamp'], writer, 0, 1,
+                                          batch_size=batch_size)
 
                 state['last_seq'] = first_buff_seq - 1
                 self._process_buffered_packets(device_id, current_time, writer)
@@ -482,7 +490,7 @@ class Server:
         temp = None
         humid = None
         volt = None
-        
+
         # Extract sensor values by type (not by position)
         for reading in packet.readings:
             if reading.sensor_type == SENSOR_TEMP:
@@ -491,13 +499,14 @@ class Server:
                 humid = reading.value
             elif reading.sensor_type == SENSOR_VOLT:
                 volt = reading.value
-        
+
         return (temp, humid, volt)
 
         ##########################################################################################################################################################################################
         ##########################################################################################################################################################################################
         ##########################################################################################################################################################################################
         # NEW HELPER: Get the FIRST reading values from a packet (for interpolation target)
+
     def _get_first_packet_values(self, packet):
         temp = None
         humid = None
@@ -521,6 +530,7 @@ class Server:
                 break
 
         return (temp, humid, volt)
+
     # --- NEW HELPER: Linear Interpolation ---
     ##########################################################################################################################################################################################
     ##########################################################################################################################################################################################
@@ -635,6 +645,7 @@ class Server:
                 ])
 
         if self.telemetry_file: self.telemetry_file.flush()
+
     def _log_data_packet(self, packet, timestamp_str, precise_time, writer, is_dup, is_gap, device_id):
         temp, humid, volt = self._get_packet_values(packet)
 
@@ -643,21 +654,24 @@ class Server:
 
         if is_batched:
             # Log individual readings to batch details CSV
-            self.log_batch_details(timestamp_str, packet.device_id, packet.seq_num, packet.readings,is_dup, is_gap)
-            
+            self.log_batch_details(timestamp_str, packet.device_id, packet.seq_num, packet.readings, is_dup, is_gap)
+
             # Calculate averages for main CSV
             from collections import defaultdict
             sensor_sums = defaultdict(list)
-            
+
             # Group readings by sensor type
             for reading in packet.readings:
                 sensor_sums[reading.sensor_type].append(reading.value)
-            
+
             # Calculate averages
-            temp_avg = sum(sensor_sums[SENSOR_TEMP]) / len(sensor_sums[SENSOR_TEMP]) if SENSOR_TEMP in sensor_sums else None
-            humid_avg = sum(sensor_sums[SENSOR_HUM]) / len(sensor_sums[SENSOR_HUM]) if SENSOR_HUM in sensor_sums else None
-            volt_avg = sum(sensor_sums[SENSOR_VOLT]) / len(sensor_sums[SENSOR_VOLT]) if SENSOR_VOLT in sensor_sums else None
-            
+            temp_avg = sum(sensor_sums[SENSOR_TEMP]) / len(
+                sensor_sums[SENSOR_TEMP]) if SENSOR_TEMP in sensor_sums else None
+            humid_avg = sum(sensor_sums[SENSOR_HUM]) / len(
+                sensor_sums[SENSOR_HUM]) if SENSOR_HUM in sensor_sums else None
+            volt_avg = sum(sensor_sums[SENSOR_VOLT]) / len(
+                sensor_sums[SENSOR_VOLT]) if SENSOR_VOLT in sensor_sums else None
+
             # Use averages for main CSV
             temp_str = f"{temp_avg:.2f}" if temp_avg is not None else '<null>'
             humid_str = f"{humid_avg:.2f}" if humid_avg is not None else '<null>'
@@ -667,9 +681,9 @@ class Server:
             temp_str = f"{temp:.2f}" if temp is not None else '<null>'
             humid_str = f"{humid:.2f}" if humid is not None else '<null>'
             volt_str = f"{volt:.2f}" if volt is not None else '<null>'
-        
+
         writer.writerow([
-            timestamp_str, precise_time, packet.device_id, packet.seq_num, 'DATA',is_dup,is_gap,
+            timestamp_str, precise_time, packet.device_id, packet.seq_num, 'DATA', is_dup, is_gap,
             temp_str, humid_str, volt_str
         ])
         if self.telemetry_file: self.telemetry_file.flush()
@@ -678,22 +692,22 @@ class Server:
         """Calculate all required Phase 2 metrics"""
         if self.start_time is None:
             return {}
-        
+
         duration = time.time() - self.start_time
-        
+
         # Calculate bytes per report (average packet size)
         bytes_per_report = self.total_bytes_received / self.packets_received if self.packets_received > 0 else 0
-        
+
         # Calculate duplicate rate as percentage
         duplicate_rate = (self.duplicate_count / self.packets_received * 100) if self.packets_received > 0 else 0
-        
+
         # Calculate CPU time per report (average) - use basic timing if psutil not available
         if self.psutil_available and self.cpu_times:
             cpu_ms_per_report = sum(self.cpu_times) / len(self.cpu_times)
         else:
             # Fallback: estimate CPU time from packet processing
             cpu_ms_per_report = (duration * 1000) / self.packets_received if self.packets_received > 0 else 0
-        
+
         return {
             'bytes_per_report': bytes_per_report,
             'packets_received': self.packets_received,
@@ -708,19 +722,19 @@ class Server:
     def write_metrics_to_csv(self):
         """Append metrics to the end of the CSV file"""
         metrics = self.calculate_metrics()
-        
+
         if not metrics:
             return
-        
+
         # Append metrics to the CSV file
         with open(self.log_file, 'a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
-            
+
             # Add separator rows
             writer.writerow(['', '', '', '', '', '', '', ''])
             writer.writerow(['=== PHASE 2 METRICS REPORT ===', '', '', '', '', '', '', ''])
             writer.writerow(['', '', '', '', '', '', '', ''])
-            
+
             # Required Phase 2 metrics
             writer.writerow(['METRIC', 'VALUE', 'UNIT', '', '', '', '', ''])
             writer.writerow(['bytes_per_report', f"{metrics['bytes_per_report']:.2f}", 'bytes', '', '', '', '', ''])
@@ -728,48 +742,52 @@ class Server:
             writer.writerow(['duplicate_rate', f"{metrics['duplicate_rate']:.3f}", 'percent', '', '', '', '', ''])
             writer.writerow(['sequence_gap_count', metrics['sequence_gap_count'], 'count', '', '', '', '', ''])
             cpu_note = " (estimated)" if not self.psutil_available else ""
-            writer.writerow(['cpu_ms_per_report', f"{metrics['cpu_ms_per_report']:.3f}", f'milliseconds{cpu_note}', '', '', '', '', ''])
-            
+            writer.writerow(
+                ['cpu_ms_per_report', f"{metrics['cpu_ms_per_report']:.3f}", f'milliseconds{cpu_note}', '', '', '', '',
+                 ''])
+
             # Additional performance metrics
             writer.writerow(['', '', '', '', '', '', '', ''])
             writer.writerow(['=== ADDITIONAL METRICS ===', '', '', '', '', '', '', ''])
             writer.writerow(['duration_seconds', f"{metrics['duration_seconds']:.1f}", 'seconds', '', '', '', '', ''])
-            writer.writerow(['packets_per_second', f"{metrics['packets_per_second']:.1f}", 'packets/sec', '', '', '', '', ''])
+            writer.writerow(
+                ['packets_per_second', f"{metrics['packets_per_second']:.1f}", 'packets/sec', '', '', '', '', ''])
             writer.writerow(['bytes_per_second', f"{metrics['bytes_per_second']:.1f}", 'bytes/sec', '', '', '', '', ''])
             writer.writerow(['total_bytes_received', self.total_bytes_received, 'bytes', '', '', '', '', ''])
-            
+
             # Per-device statistics
             writer.writerow(['', '', '', '', '', '', '', ''])
             writer.writerow(['=== PER-DEVICE STATISTICS ===', '', '', '', '', '', '', ''])
             writer.writerow(['Device_ID', 'Packets', 'Duplicates', 'Dup_Rate_%', 'Gaps', 'Bytes', '', ''])
-            
+
             for device_id, state in sorted(self.device_states.items()):
                 device_dup_rate = (state['duplicates'] / state['packets'] * 100) if state['packets'] > 0 else 0
-                writer.writerow([device_id, state['packets'], state['duplicates'], 
-                               f"{device_dup_rate:.1f}", state['gaps'], state['bytes'], '', ''])
-            
+                writer.writerow([device_id, state['packets'], state['duplicates'],
+                                 f"{device_dup_rate:.1f}", state['gaps'], state['bytes'], '', ''])
+
             # Phase 2 compliance
             writer.writerow(['', '', '', '', '', '', '', ''])
             writer.writerow(['=== PHASE 2 COMPLIANCE ===', '', '', '', '', '', '', ''])
             writer.writerow(['Check', 'Status', 'Threshold', '', '', '', '', ''])
-            
+
             compliance_checks = [
                 ("Duplicate rate <= 1%", metrics['duplicate_rate'] <= 1.0, "<= 1%"),
                 ("Packets received > 0", metrics['packets_received'] > 0, "> 0"),
-                ("No critical gaps", metrics['sequence_gap_count'] < metrics['packets_received'] * 0.05, "< 5% of packets")
+                ("No critical gaps", metrics['sequence_gap_count'] < metrics['packets_received'] * 0.05,
+                 "< 5% of packets")
             ]
-            
+
             all_passed = True
             for check_name, passed, threshold in compliance_checks:
                 status = "PASS" if passed else "FAIL"
                 writer.writerow([check_name, status, threshold, '', '', '', '', ''])
                 if not passed:
                     all_passed = False
-            
+
             overall_status = "COMPLIANT" if all_passed else "NON-COMPLIANT"
             writer.writerow(['', '', '', '', '', '', '', ''])
             writer.writerow(['OVERALL STATUS', overall_status, '', '', '', '', '', ''])
-            
+
             # Add timestamp
             end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             writer.writerow(['Report generated', end_time, '', '', '', '', '', ''])
@@ -777,15 +795,15 @@ class Server:
     def print_metrics_report(self):
         """Print comprehensive metrics report"""
         metrics = self.calculate_metrics()
-        
+
         if not metrics:
             print("[METRICS] No data collected")
             return
-        
-        print("\n" + "="*70)
+
+        print("\n" + "=" * 70)
         print("PHASE 2 METRICS REPORT")
-        print("="*70)
-        
+        print("=" * 70)
+
         # Required Phase 2 metrics
         print(f"bytes_per_report:     {metrics['bytes_per_report']:.2f} bytes")
         print(f"packets_received:     {metrics['packets_received']}")
@@ -793,13 +811,13 @@ class Server:
         print(f"sequence_gap_count:   {metrics['sequence_gap_count']}")
         cpu_note = " (estimated)" if not self.psutil_available else ""
         print(f"cpu_ms_per_report:    {metrics['cpu_ms_per_report']:.3f} ms{cpu_note}")
-        
+
         print("\nAdditional Performance Metrics:")
         print(f"Duration:             {metrics['duration_seconds']:.1f} seconds")
         print(f"Packets per second:   {metrics['packets_per_second']:.1f}")
         print(f"Bytes per second:     {metrics['bytes_per_second']:.1f}")
         print(f"Total bytes received: {self.total_bytes_received}")
-        
+
         # Per-device breakdown
         print(f"\nPer-Device Statistics:")
         for device_id, state in self.device_states.items():
@@ -807,41 +825,42 @@ class Server:
             print(f"  Device {device_id}: {state['packets']} packets, "
                   f"{state['duplicates']} duplicates ({device_dup_rate:.1f}%), "
                   f"{state['gaps']} gaps, {state['bytes']} bytes")
-        
+
         # Phase 2 compliance check
         print(f"\nPhase 2 Compliance:")
         compliance_checks = [
             ("Duplicate rate <= 1%", metrics['duplicate_rate'] <= 1.0),
             ("Packets received > 0", metrics['packets_received'] > 0),
-            ("No critical gaps", metrics['sequence_gap_count'] < metrics['packets_received'] * 0.05)  # Less than 5% gaps
+            ("No critical gaps", metrics['sequence_gap_count'] < metrics['packets_received'] * 0.05)
+            # Less than 5% gaps
         ]
-        
+
         all_passed = True
         for check_name, passed in compliance_checks:
             status = "PASS" if passed else "FAIL"
             print(f"  {check_name}: {status}")
             if not passed:
                 all_passed = False
-        
+
         overall_status = "COMPLIANT" if all_passed else "NON-COMPLIANT"
         print(f"\nOverall Status: {overall_status}")
-        print("="*70)
+        print("=" * 70)
 
     def finalize_and_save_metrics(self):
         """Write metrics to CSV and print report"""
         print("\n[SERVER] Finalizing metrics...")
-        
+
         # Close batch details file
         if self.batch_details_file_handle:
             self.batch_details_file_handle.close()
             print(f"[SERVER] Batch details saved to: {self.batch_details_file}")
-        
+
         # Write metrics to CSV file
         self.write_metrics_to_csv()
-        
+
         # Print final metrics report to console
         self.print_metrics_report()
-        
+
         print(f"[SERVER] Metrics saved to: {self.log_file}")
 
     def _print_buffer_statistics(self):
@@ -858,10 +877,10 @@ class Server:
         return {
             'last_seq': -1,
             'buffer': OrderedDict(),
-            'last_values': None,        # For Data Interpolation
-            'gap_start_time': None,     # For Gap Timeout
-            'last_heartbeat': None,     # For heartbeat tracking
-            'expected_hb_interval': 5.0 # Default heartbeat interval
+            'last_values': None,  # For Data Interpolation
+            'gap_start_time': None,  # For Gap Timeout
+            'last_heartbeat': None,  # For heartbeat tracking
+            'expected_hb_interval': 5.0  # Default heartbeat interval
         }
 
     def _print_buffer_statistics(self):
@@ -873,7 +892,6 @@ class Server:
                 total_buffered += buffered_count
                 print(f"Device {device_id}: {buffered_count} packets still buffered")
         print(f"Total buffered packets: {total_buffered}")
-
 
 
 if __name__ == '__main__':

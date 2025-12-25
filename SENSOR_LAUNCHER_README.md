@@ -52,6 +52,10 @@ python sensor_launcher.py --temp --temp-id 5001 --humid --humid-id 5002
 - `--server-port 5000` - Server port
 - `--sequential` - Run clients one after another (default: parallel)
 
+- `--port 5000` -This can be used when launching server as well as 
+- `--auto-shutdown 10` auto shutdown after 10 s of inactivity
+- `--log` choose a log file 
+
 ## Examples
 
 **Quick test (20 seconds):**

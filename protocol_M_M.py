@@ -212,7 +212,7 @@ def decode_packet(data: bytes) -> TelemetryPacket:
     raise ValueError(f"Unreachable decoding state for msg_type: {msg_type}")
 
 
-# batching functions
+'''# batching functions
 def create_reading_packet(sensor_type: int, value: float, device_id: int,
                           seq_num: int, timestamp: int) -> TelemetryPacket:
     # create a DATA packet containing one sensor reading (flags=0, not batched)
@@ -294,9 +294,9 @@ def send_packet(packets: List[TelemetryPacket], batching: Optional[bool] = None)
         out_bytes.append(encode_packet(batched))
 
     return out_bytes
+'''
 
-
-# main function testing
+'''# main function testing
 if __name__ == "__main__":
     print("=" * 60)
     print("TESTING IOT TELEMETRY PROTOCOL")
@@ -419,4 +419,6 @@ if __name__ == "__main__":
 
     print("\n" + "=" * 60)
     print("ALL TESTS PASSED ✓")
-    print("=" * 60)
+    print("=" * 60) 
+    '''
+

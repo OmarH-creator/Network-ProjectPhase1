@@ -4,7 +4,7 @@ import argparse
 import time
 from datetime import datetime, timedelta
 from collections import deque, OrderedDict, defaultdict
-from protocol_M_M import decode_packet, MSG_INIT, MSG_DATA, MSG_HEARTBEAT, SENSOR_TEMP, SENSOR_HUM, SENSOR_VOLT
+from protocol_M_M import decode_packet, MSG_INIT, MSG_DATA, MSG_HEARTBEAT, SENSOR_TEMP, SENSOR_HUM, SENSOR_VOLT,FLAG_BATCHING
 
 # Try to import psutil for CPU monitoring, fallback if not available
 try:
@@ -44,14 +44,14 @@ class Server:
             'packets': 0,
             'duplicates': 0,
             'gaps': 0,
-            "total_gaps": 0,  # <--- FIX
             "total_gap_packets": 0,  # <--- optional but recommended
             'bytes': 0,
             'buffer': OrderedDict(),
             'last_values': None,
             'gap_start_time': None,
             'last_heartbeat': None,
-            'expected_hb_interval': 5.0
+            'expected_hb_interval': 5.0,
+            'is_batch_mode': False
         })
 
         # Batch details CSV file
@@ -124,6 +124,7 @@ class Server:
                             cpu_time_ms = (cpu_end - cpu_start) * 1000
                             self.cpu_times.append(cpu_time_ms)
 
+
                             if self.packet_count % 100 == 0:
                                 self._cleanup_old_buffers(timestamp, writer)
                             
@@ -166,6 +167,7 @@ class Server:
         # --- FIX: INCREMENT COUNTERS HERE ---
         device_state['packets'] += 1
         device_state['bytes'] += packet_size
+        device_state['is_batch_mode'] = (packet.flags & FLAG_BATCHING) != 0
         # ------------------------------------
 
         buffer = device_state['buffer']
@@ -197,6 +199,7 @@ class Server:
                 # --- DUPLICATE HEARTBEAT ---
                 if last_seq != -1 and current_seq <= last_seq:
                     is_duplicate = 1
+                    print(f"[{self.packet_count}] HEARTBEAT device {packet.device_id} [DUPLICATE]")
 
                     device_state['duplicates'] += 1
                     self.duplicate_count += 1
@@ -222,8 +225,7 @@ class Server:
 
                         device_state['gaps'] += 1
                         device_state['total_gap_packets'] += gap_size  # FIXED
-                        self.total_gap_count += 1
-                        self.total_gap_packet_loss += gap_size
+                        self.sequence_gaps+=gap_size
 
                         writer.writerow([
                             timestamp_str, precise_time, packet.device_id,
@@ -231,6 +233,7 @@ class Server:
                             '<null>', '<null>', '<null>'
                         ])
                         # DO NOT interpolate HB packet
+                print(f"[{self.packet_count}] HEARTBEAT device {packet.device_id} [IN-ORDER]")
 
                 # --- NORMAL HEARTBEAT ---
                 device_state['last_seq'] = current_seq
@@ -255,13 +258,13 @@ class Server:
                 print(f"[{self.packet_count}] DATA {packet.device_id} seq={current_seq} [DUPLICATE]")
                 device_state['duplicates'] += 1
                 self.duplicate_count += 1
-                self._log_data_packet(packet, timestamp_str, precise_time, writer, 1, 0)
+                self._log_data_packet(packet, timestamp_str, precise_time, writer, 1, 0,packet.device_id)
                 return
 
             # 2. In-Order Check
             if current_seq == last_seq + 1:
                 print(f"[{self.packet_count}] DATA {packet.device_id} seq={current_seq} [IN-ORDER]")
-                self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0)
+                self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0,packet.device_id)
 
                 # Update last_values for interpolation
                 device_state['last_values'] = self._get_packet_values(packet)
@@ -311,7 +314,7 @@ class Server:
                     # Now process the buffered packets (or current) naturally
                     if current_seq == device_state['last_seq'] + 1:
                         # Current packet is now next
-                        self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0)
+                        self._log_data_packet(packet, timestamp_str, precise_time, writer, 0, 0,packet.device_id)
                         device_state['last_values'] = self._get_packet_values(packet)
                         device_state['last_seq'] = current_seq
                     else:
@@ -433,7 +436,7 @@ class Server:
             if next_seq == last_seq + 1:
                 item = buffer.pop(next_seq)
                 print(f"[REORDER] releasing seq={next_seq}")
-                self._log_data_packet(item['packet'], item['timestamp'], item['precise_time'], writer, False, False)
+                self._log_data_packet(item['packet'], item['timestamp'], item['precise_time'], writer, 0, 0,device_id)
 
                 # Update state
                 device_state['last_values'] = self._get_packet_values(item['packet'])
@@ -631,13 +634,13 @@ class Server:
                 ])
 
         if self.telemetry_file: self.telemetry_file.flush()
-    def _log_data_packet(self, packet, timestamp_str, precise_time, writer, is_dup, is_gap):
+    def _log_data_packet(self, packet, timestamp_str, precise_time, writer, is_dup, is_gap, device_id):
         temp, humid, volt = self._get_packet_values(packet)
-        
-        # Determine if this is a batch (multiple readings) or single reading
-        is_batch = len(packet.readings) > 1
-        
-        if is_batch:
+
+        is_batched = (packet.flags & FLAG_BATCHING) != 0
+        self.device_states[packet.device_id]['is_batch_mode'] = is_batched
+
+        if is_batched:
             # Log individual readings to batch details CSV
             self.log_batch_details(timestamp_str, packet.device_id, packet.seq_num, packet.readings,is_dup, is_gap)
             

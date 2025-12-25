@@ -15,7 +15,8 @@ sys.path.append("")
 
 from protocol_M_M import (
     VERSION, MSG_INIT, MSG_DATA, MSG_HEARTBEAT, SENSOR_VOLT,
-    TelemetryPacket, SensorReading, encode_packet
+    TelemetryPacket, SensorReading, encode_packet,
+    HEADER_SIZE, READING_SIZE, PAYLOAD_LIMIT, FLAG_BATCHING
 )
 
 class VoltageClient:
@@ -39,7 +40,7 @@ class VoltageClient:
         self.enable_batching = enable_batching
         self.batching_interval = batching_interval
         self.batch_readings = []  # Collect readings for batching
-        self.max_readings_per_packet = 37  # (200 - 12 - 1) / 5 = 37 max readings
+        self.max_readings_per_packet = (PAYLOAD_LIMIT - HEADER_SIZE - 1) // READING_SIZE  # Calculate from protocol constants
         
         # Use deterministic seed for reproducible results
         if seed is not None:
@@ -112,7 +113,7 @@ class VoltageClient:
         
         packet = TelemetryPacket(
             VERSION, MSG_DATA, self.device_id,
-            self.seq, int(time.time()), self.batch_readings.copy(), flags=0x01  # FLAG_BATCHING
+            self.seq, int(time.time()), self.batch_readings.copy(), flags=FLAG_BATCHING
         )
         self.sock.sendto(encode_packet(packet), (self.host, self.port))
         
